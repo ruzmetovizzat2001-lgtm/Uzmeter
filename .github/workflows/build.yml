@@ -88,3 +88,31 @@ jobs:
             dotnet-app/out/${{ matrix.rid }}/UzMeter.exe
             dotnet-app/out/Uz-Meter-${{ matrix.rid }}.zip
           if-no-files-found: error
+
+  # ---------------- Release (faqat v* teglar) ----------------
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [rust, dotnet]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Rename files by platform
+        run: |
+          mkdir -p release
+          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/msi/*.msi          release/Uz-Meter-rust-windows-x64.msi
+          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/nsis/*.exe         release/Uz-Meter-rust-windows-x64-setup.exe
+          cp dist/uz-meter-rust-aarch64-apple-darwin/dmg/*.dmg            release/Uz-Meter-rust-macos-apple-silicon.dmg
+          cp dist/uz-meter-rust-x86_64-apple-darwin/dmg/*.dmg             release/Uz-Meter-rust-macos-intel.dmg
+          cp dist/uz-meter-dotnet-win-x64/win-x64/UzMeter.exe             release/Uz-Meter-dotnet-windows-x64.exe
+          cp dist/uz-meter-dotnet-osx-arm64/Uz-Meter-osx-arm64.zip        release/Uz-Meter-dotnet-macos-apple-silicon.zip
+          cp dist/uz-meter-dotnet-osx-x64/Uz-Meter-osx-x64.zip            release/Uz-Meter-dotnet-macos-intel.zip
+          ls -la release
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
