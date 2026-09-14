@@ -18,7 +18,7 @@ jobs:
         include:
           - { os: windows-latest, name: Windows x64, target: x86_64-pc-windows-msvc }
           - { os: macos-latest,   name: macOS Apple Silicon, target: aarch64-apple-darwin }
-          - { os: macos-13,       name: macOS Intel, target: x86_64-apple-darwin }
+          - { os: macos-latest,   name: macOS Intel, target: x86_64-apple-darwin }   # Apple Silicon mashinasida kross-kompilyatsiya (macos-13 runner deyarli yo'q)
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
