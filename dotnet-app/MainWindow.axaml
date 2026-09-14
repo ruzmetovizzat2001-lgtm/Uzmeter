@@ -1,0 +1,468 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="UzMeter.MainWindow"
+        Title="Uz-Meter"
+        Width="1280" Height="800" MinWidth="1100" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Icon="/Assets/icon.ico">
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+    <!-- ===== Menyu ===== -->
+    <Menu Grid.Row="0">
+      <MenuItem Name="MFile">
+        <MenuItem Name="MOpen" HotKey="Ctrl+O" InputGesture="Ctrl+O" Click="OnOpen"/>
+        <MenuItem Name="MSave" HotKey="Ctrl+S" InputGesture="Ctrl+S" Click="OnSave"/>
+        <Separator/>
+        <MenuItem Name="MQuit" HotKey="Ctrl+Q" InputGesture="Ctrl+Q" Click="OnQuit"/>
+      </MenuItem>
+      <MenuItem Name="MEdit">
+        <MenuItem Name="MReset" Click="OnReset"/>
+        <MenuItem Name="MCopyHex" Click="OnCopyHex"/>
+        <MenuItem Name="MClearLog" Click="OnClearLog"/>
+      </MenuItem>
+      <MenuItem Name="MView">
+        <MenuItem Name="MLanguage">
+          <MenuItem Header="O'zbekcha" Tag="uz" Click="OnLangMenu"/>
+          <MenuItem Header="Русский" Tag="ru" Click="OnLangMenu"/>
+          <MenuItem Header="English" Tag="en" Click="OnLangMenu"/>
+        </MenuItem>
+        <MenuItem Name="MTheme">
+          <MenuItem Name="MThemeDark" Tag="dark" Click="OnThemeMenu"/>
+          <MenuItem Name="MThemeLight" Tag="light" Click="OnThemeMenu"/>
+        </MenuItem>
+        <Separator/>
+        <MenuItem Name="MSound" Click="OnSoundToggle"/>
+      </MenuItem>
+      <MenuItem Name="MHelp">
+        <MenuItem Name="MProtocol" HotKey="F1" InputGesture="F1" Click="OnHelpMenu"/>
+        <Separator/>
+        <MenuItem Name="MAbout" Click="OnHelpMenu"/>
+      </MenuItem>
+    </Menu>
+
+    <!-- ===== Yuqori panel ===== -->
+    <Border Grid.Row="1" Classes="topbar">
+      <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Border Classes="appicon"><Image Source="/Assets/app-icon.png" Stretch="UniformToFill"/></Border>
+          <StackPanel VerticalAlignment="Center" Spacing="2">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="title" Text="Uz-Meter"/>
+              <Border Classes="ver"><TextBlock Text="v1.0"/></Border>
+            </StackPanel>
+            <TextBlock Name="AppSubtitle" Classes="sub"/>
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Border Classes="seg">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <Button Name="LangUz" Content="UZ" Tag="uz" Click="OnLangButton"/>
+              <Button Name="LangRu" Content="RU" Tag="ru" Click="OnLangButton"/>
+              <Button Name="LangEn" Content="EN" Tag="en" Click="OnLangButton"/>
+            </StackPanel>
+          </Border>
+          <Border Classes="seg">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <Button Name="ThemeLightBtn" Tag="light" Click="OnThemeButton" Padding="9,0"><Path Classes="ico" Data="{StaticResource IconSun}"/></Button>
+              <Button Name="ThemeDarkBtn" Tag="dark" Click="OnThemeButton" Padding="9,0"><Path Classes="ico" Data="{StaticResource IconMoon}"/></Button>
+            </StackPanel>
+          </Border>
+          <Border Classes="vsep"/>
+          <Button Name="SettingsBtn" Classes="icon" Tag="settings" Click="OnNav"><Path Classes="ico" Data="{StaticResource IconCog}"/></Button>
+          <Button Name="HelpBtn" Classes="icon" Tag="help" Click="OnNav"><Path Classes="ico" Data="{StaticResource IconHelp}"/></Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ===== Tana: yon panel + asosiy maydon ===== -->
+    <Grid Grid.Row="2" ColumnDefinitions="196,*">
+
+      <!-- yon panel -->
+      <Border Grid.Column="0" Classes="sidebar">
+        <Grid RowDefinitions="*,Auto">
+          <StackPanel Spacing="4">
+            <Button Name="NavHome" Classes="nav on" Tag="home" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconHome}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavHome"/></Grid>
+            </Button>
+            <Button Name="NavConfig" Classes="nav" Tag="config" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconCog}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavConfig"/></Grid>
+            </Button>
+            <Button Name="NavDevice" Classes="nav" Tag="device" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconDoc}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavDevice"/></Grid>
+            </Button>
+            <Button Name="NavLog" Classes="nav" Tag="log" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconList}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavLog"/>
+                <Border Grid.Column="2" Name="NavLogBadge" Classes="navbadge" IsVisible="False" Margin="8,0,0,0"><TextBlock Name="NavLogCount" Text="0"/></Border>
+              </Grid>
+            </Button>
+            <Button Name="NavSettings" Classes="nav" Tag="settings" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconCog}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavSettings"/></Grid>
+            </Button>
+            <Button Name="NavHelp" Classes="nav" Tag="help" Click="OnNav">
+              <Grid ColumnDefinitions="Auto,*,Auto"><Path Classes="ico" Data="{StaticResource IconHelp}" Margin="0,0,12,0"/><TextBlock Grid.Column="1" Name="LNavHelp"/></Grid>
+            </Button>
+          </StackPanel>
+
+          <!-- shior + bezak -->
+          <Grid Grid.Row="1" Height="130" Margin="-10,0,-10,-14" ClipToBounds="True">
+            <Canvas>
+              <Path Canvas.Left="0" Canvas.Top="30" Fill="{DynamicResource Decor1Brush}" Data="M-10 40 C 30 10, 70 70, 110 40 S 190 10, 230 40 L 230 120 L -10 120 Z"/>
+              <Path Canvas.Left="0" Canvas.Top="50" Fill="{DynamicResource Decor2Brush}" Data="M-10 40 C 40 10, 80 70, 130 40 S 200 10, 230 40 L 230 120 L -10 120 Z"/>
+              <Path Canvas.Left="140" Canvas.Top="60" Fill="{DynamicResource DecorLeafBrush}" Data="M10 47 C 10 22, 25 4, 50 0 C 50 26, 35 42, 10 47 Z"/>
+              <Path Canvas.Left="126" Canvas.Top="68" Fill="{DynamicResource DecorLeaf2Brush}" Data="M10 44 C 6 28, 12 14, 28 6 C 32 24, 24 38, 10 44 Z"/>
+            </Canvas>
+            <TextBlock Name="Tagline" Classes="tagline" VerticalAlignment="Top" Margin="20,10,20,0"/>
+          </Grid>
+        </Grid>
+      </Border>
+
+      <!-- asosiy maydon -->
+      <Grid Name="MainArea" Grid.Column="1" Margin="14,12" RowDefinitions="Auto,Auto,*" ColumnDefinitions="1.1*,*" RowSpacing="12" ColumnSpacing="12">
+
+        <!-- ulanish paneli -->
+        <Border Name="ConnBar" Grid.Row="0" Grid.ColumnSpan="2" Classes="card" Padding="16,10">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+              <Grid><Ellipse Name="ConnRing" Classes="connring"/><Ellipse Name="ConnDot" Classes="conndot"/></Grid>
+              <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock Name="ConnTitle" Classes="conntitle"/>
+                <TextBlock Name="ConnSub" Classes="sub" TextTrimming="CharacterEllipsis" MaxWidth="280"/>
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="3">
+              <TextBlock Name="LPort" Classes="label muted" Margin="0"/>
+              <ComboBox Name="PortBox" Width="250" SelectionChanged="OnPortChanged"/>
+            </StackPanel>
+            <Button Grid.Column="2" Name="RefreshBtn" VerticalAlignment="Bottom" Click="OnRefreshPorts">
+              <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconRefresh}"/><TextBlock Name="LRefresh"/></StackPanel>
+            </Button>
+            <StackPanel Grid.Column="3" Spacing="3">
+              <TextBlock Name="LBaud" Classes="label muted" Margin="0"/>
+              <ComboBox Name="BaudBox" Width="130" SelectionChanged="OnPortChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="4" Spacing="3" HorizontalAlignment="Right">
+              <Button Name="ConnectBtn" Classes="primary" MinWidth="150" Click="OnConnect">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconPlug}"/><TextBlock Name="LConnect"/></StackPanel>
+              </Button>
+              <Button Name="DisconnectBtn" Classes="danger" MinWidth="150" Click="OnDisconnect" IsVisible="False">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconUnplug}"/><TextBlock Name="LDisconnect"/></StackPanel>
+              </Button>
+              <TextBlock Name="ConnSince" Classes="tiny" HorizontalAlignment="Right" Text=" "/>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- ===== Konfiguratsiya ===== -->
+        <Border Name="ConfigCard" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Classes="card">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" RowSpacing="4">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,2">
+              <TextBlock Name="LConfig" Classes="h2"/>
+              <Border Grid.Column="1" Classes="badge"><TextBlock Text="CMD 0x01"/></Border>
+            </Grid>
+
+            <Border Grid.Row="1" Classes="sec"><StackPanel Orientation="Horizontal"><Border Classes="num"><TextBlock Text="1"/></Border><TextBlock Name="LSec1" Classes="sectitle"/></StackPanel></Border>
+            <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="12">
+              <StackPanel Grid.Column="0">
+                <StackPanel Orientation="Horizontal"><TextBlock Name="LDeviceNo" Classes="label"/><TextBlock Classes="req" Text="*"/></StackPanel>
+                <Grid>
+                  <TextBox Name="DeviceNoBox" Classes="mono" MaxLength="15" Watermark="000000000000000" TextChanged="OnDigitsChanged" Padding="12,0,84,0"/>
+                  <TextBlock Name="DeviceNoCntIn" Classes="counter in" HorizontalAlignment="Right" Margin="0,0,32,0"/>
+                  <Border Name="DeviceNoOk" Classes="checkico" IsVisible="False"><Path Data="{StaticResource IconCheck}"/></Border>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,1,0,0">
+                  <TextBlock Name="LDeviceNoHint" Classes="hint"/>
+                  <TextBlock Grid.Column="1" Name="DeviceNoCnt" Classes="counter foot" Text="0 / 15"/>
+                </Grid>
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <StackPanel Orientation="Horizontal"><TextBlock Name="LMNo" Classes="label"/><TextBlock Classes="req" Text="*"/></StackPanel>
+                <Grid>
+                  <TextBox Name="MNoBox" Classes="mono" MaxLength="14" Watermark="00000000000000" TextChanged="OnDigitsChanged" Padding="12,0,84,0"/>
+                  <TextBlock Name="MNoCntIn" Classes="counter in" HorizontalAlignment="Right" Margin="0,0,32,0"/>
+                  <Border Name="MNoOk" Classes="checkico" IsVisible="False"><Path Data="{StaticResource IconCheck}"/></Border>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,1,0,0">
+                  <TextBlock Name="LMNoHint" Classes="hint"/>
+                  <TextBlock Grid.Column="1" Name="MNoCnt" Classes="counter foot" Text="0 / 14"/>
+                </Grid>
+              </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="3" Classes="sec"><StackPanel Orientation="Horizontal"><Border Classes="num"><TextBlock Text="2"/></Border><TextBlock Name="LSec2" Classes="sectitle"/></StackPanel></Border>
+            <StackPanel Grid.Row="4">
+              <StackPanel Orientation="Horizontal"><TextBlock Name="LServerUrl" Classes="label"/><TextBlock Classes="req" Text="*"/></StackPanel>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Grid>
+                  <TextBox Name="UrlBox" Classes="mono" MaxLength="128" Watermark="https://example.uz/api" TextChanged="OnFormChanged" Padding="12,0,100,0"/>
+                  <TextBlock Name="UrlCntIn" Classes="counter in" HorizontalAlignment="Right" Margin="0,0,32,0"/>
+                  <Border Name="UrlOk" Classes="checkico" IsVisible="False"><Path Data="{StaticResource IconCheck}"/></Border>
+                </Grid>
+                <Path Grid.Column="1" Name="UrlInfo" Classes="ico primary" Data="{StaticResource IconInfo}" Width="18" Height="18"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto" Margin="0,1,0,0">
+                <TextBlock Name="LUrlHint" Classes="hint"/>
+                <TextBlock Grid.Column="1" Name="UrlCnt" Classes="counter foot" Text="0 / 128"/>
+              </Grid>
+            </StackPanel>
+
+            <Border Grid.Row="5" Classes="sec"><StackPanel Orientation="Horizontal"><Border Classes="num"><TextBlock Text="3"/></Border><TextBlock Name="LSec3" Classes="sectitle"/></StackPanel></Border>
+            <Grid Grid.Row="6" ColumnDefinitions="*,*" ColumnSpacing="12">
+              <StackPanel Grid.Column="0">
+                <TextBlock Name="LValve" Classes="label"/>
+                <Border Classes="seg wide">
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="2">
+                    <Button Grid.Column="0" Name="ValveOpenBtn" Tag="1" HorizontalAlignment="Stretch" Click="OnValve"/>
+                    <Button Grid.Column="1" Name="ValveClosedBtn" Tag="0" HorizontalAlignment="Stretch" Click="OnValve"/>
+                  </Grid>
+                </Border>
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <TextBlock Name="LUnit" Classes="label"/>
+                <Border Classes="seg wide">
+                  <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="2">
+                    <Button Grid.Column="0" Name="Unit0" Content="1 L" Tag="0" HorizontalAlignment="Stretch" Click="OnUnit"/>
+                    <Button Grid.Column="1" Name="Unit1" Content="10 L" Tag="1" HorizontalAlignment="Stretch" Click="OnUnit"/>
+                    <Button Grid.Column="2" Name="Unit2" Content="100 L" Tag="2" HorizontalAlignment="Stretch" Click="OnUnit"/>
+                    <Button Grid.Column="3" Name="Unit3" Content="1000 L" Tag="3" HorizontalAlignment="Stretch" Click="OnUnit"/>
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="7" ColumnDefinitions="*,*" ColumnSpacing="12">
+              <StackPanel Grid.Column="0">
+                <Border Classes="sec"><StackPanel Orientation="Horizontal"><Border Classes="num"><TextBlock Text="4"/></Border><TextBlock Name="LSec4" Classes="sectitle"/></StackPanel></Border>
+                <TextBlock Name="LSends" Classes="label"/>
+                <ComboBox Name="SendsBox" HorizontalAlignment="Stretch" SelectionChanged="OnFormChanged"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <Border Classes="sec"><StackPanel Orientation="Horizontal"><Border Classes="num"><TextBlock Text="5"/></Border><TextBlock Name="LSec5" Classes="sectitle"/></StackPanel></Border>
+                <TextBlock Name="LMeterType" Classes="label"/>
+                <ComboBox Name="TypeBox" HorizontalAlignment="Stretch" SelectionChanged="OnFormChanged"/>
+              </StackPanel>
+            </Grid>
+
+            <!-- kadr asboblari -->
+            <Grid Grid.Row="8" ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="6" Margin="0,2,0,0">
+              <TextBlock Grid.Column="0" Name="LFramePreview" Classes="label" Margin="0" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1" Name="FrameLen" Classes="tiny" VerticalAlignment="Center"/>
+              <Border Grid.Column="2" Classes="seg">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                  <Button Name="TabHex" Content="HEX" Classes="on" Tag="hex" Click="OnFrameTab"/>
+                  <Button Name="TabStruct" Tag="struct" Click="OnFrameTab"/>
+                </StackPanel>
+              </Border>
+              <Button Grid.Column="3" Name="CopyHexBtn" Classes="sm" Click="OnCopyHex">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconCopy}"/><TextBlock Name="LCopyHex"/></StackPanel>
+              </Button>
+              <Button Grid.Column="4" Name="RecalcBtn" Classes="sm" Click="OnRecalc">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconRefresh}"/><TextBlock Name="LRecalc"/></StackPanel>
+              </Button>
+            </Grid>
+
+            <Grid Grid.Row="9" RowDefinitions="*,Auto" RowSpacing="4">
+              <Border Name="HexBox" Classes="hexbox">
+                <ScrollViewer><SelectableTextBlock Name="FramePreview" Text="—"/></ScrollViewer>
+              </Border>
+              <Border Name="StructBox" Classes="hexbox" Padding="0" IsVisible="False">
+                <ScrollViewer><StackPanel Name="StructRows"/></ScrollViewer>
+              </Border>
+              <StackPanel Grid.Row="1" Classes="note" Orientation="Horizontal" Spacing="6">
+                <Path Classes="ico primary sm" Data="{StaticResource IconInfo}"/>
+                <TextBlock Name="LFrameNote" Classes="tiny" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+              </StackPanel>
+            </Grid>
+
+            <Button Grid.Row="10" Name="SendBtn" Classes="primary lg" HorizontalAlignment="Stretch" Click="OnSend">
+              <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconUpload}"/><TextBlock Name="LSend"/></StackPanel>
+            </Button>
+          </Grid>
+        </Border>
+
+        <!-- ===== Qurilma ma'lumotlari ===== -->
+        <Border Name="DeviceCard" Grid.Row="1" Grid.Column="1" Classes="card">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Name="LDeviceData" Classes="h2"/>
+              <Border Grid.Column="1" Classes="badge"><TextBlock Text="CMD 0x02"/></Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="1.6*,*" ColumnSpacing="10">
+              <Button Grid.Column="0" Name="ReadBtn" Classes="success md" HorizontalAlignment="Stretch" Click="OnRead">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconDownload}"/><TextBlock Name="LRead"/></StackPanel>
+              </Button>
+              <Button Grid.Column="1" Name="ApplyBtn" Classes="md" HorizontalAlignment="Stretch" Click="OnApply" IsEnabled="False">
+                <StackPanel Orientation="Horizontal"><Path Classes="ico" Data="{StaticResource IconDoc}"/><TextBlock Name="LApply"/></StackPanel>
+              </Button>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+              <Border Grid.Column="0" Classes="tile">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Classes="tileico water"><Path Classes="ico" Data="{StaticResource IconDrop}"/></Border>
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Name="LWater" Classes="tilelabel"/>
+                    <TextBlock Name="TWater" Classes="tilevalue" Text="—"/>
+                    <TextBlock Classes="tileunit" Text="m³" Margin="0"/>
+                  </StackPanel>
+                  <Path Grid.Column="1" Classes="spark" Data="{StaticResource IconSpark}"/>
+                </Grid>
+              </Border>
+              <Border Grid.Column="1" Classes="tile">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Classes="tileico ok"><Path Classes="ico" Data="{StaticResource IconBolt}"/></Border>
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Name="LBattV" Classes="tilelabel"/>
+                    <StackPanel Orientation="Horizontal"><TextBlock Name="TBattV" Classes="tilevalue" Text="—"/><TextBlock Classes="tileunit" Text="V"/></StackPanel>
+                  </StackPanel>
+                  <Path Grid.Column="1" Classes="spark" Data="{StaticResource IconPulse}"/>
+                </Grid>
+              </Border>
+              <Border Grid.Column="2" Classes="tile">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Classes="tileico ok"><Grid><Path Classes="ico" Data="{StaticResource IconBatt}"/><Path Data="{StaticResource IconBattFill}" Fill="{StaticResource Ok2Brush}" Width="18" Height="18" Stretch="None" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid></Border>
+                  <StackPanel Grid.Column="1">
+                    <TextBlock Name="LBattP" Classes="tilelabel"/>
+                    <StackPanel Orientation="Horizontal"><TextBlock Name="TBattP" Classes="tilevalue" Text="—"/><TextBlock Classes="tileunit" Text="%"/></StackPanel>
+                    <ProgressBar Name="BattBar" Classes="batt" Minimum="0" Maximum="100" Value="0" Margin="0,6,0,0"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </Grid>
+
+            <Border Classes="devinfo">
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Path Classes="ico primary" Data="{StaticResource IconInfo}" Width="18" Height="18" VerticalAlignment="Top" Margin="0,2,0,0"/>
+                <Grid Grid.Column="1" Classes="kv" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Name="KDeviceNo" Classes="k"/><TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Name="DDeviceNo" Classes="v mono empty" Text="—"/>
+                  <TextBlock Grid.Row="1" Grid.Column="0" Name="KMNo" Classes="k"/><TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Name="DMNo" Classes="v mono empty" Text="—"/>
+                  <TextBlock Grid.Row="2" Grid.Column="0" Name="KUrl" Classes="k"/><TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Name="DUrl" Classes="v mono empty" Text="—"/>
+                  <TextBlock Grid.Row="3" Grid.Column="0" Name="KType" Classes="k"/><TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Name="DType" Classes="v empty" Text="—"/>
+                  <TextBlock Grid.Row="4" Grid.Column="0" Name="KValve" Classes="k"/><TextBlock Grid.Row="4" Grid.Column="1" Name="DValve" Classes="v empty" Text="—"/>
+                  <TextBlock Grid.Row="4" Grid.Column="2" Name="KUnit" Classes="k"/><TextBlock Grid.Row="4" Grid.Column="3" Name="DUnit" Classes="v empty" Text="—"/>
+                  <TextBlock Grid.Row="5" Grid.Column="0" Name="KSends" Classes="k"/><TextBlock Grid.Row="5" Grid.Column="1" Name="DSends" Classes="v empty" Text="—"/>
+                  <TextBlock Grid.Row="5" Grid.Column="2" Name="KLast" Classes="k"/><TextBlock Grid.Row="5" Grid.Column="3" Name="DLast" Classes="v empty" Text="—"/>
+                  <TextBlock Grid.Row="6" Grid.Column="0" Name="KState" Classes="k"/>
+                  <StackPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal"><Ellipse Name="StateDot" Classes="statedot"/><TextBlock Name="DState" Classes="v" FontSize="12" FontWeight="SemiBold"/></StackPanel>
+                </Grid>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- ===== Aloqa jurnali ===== -->
+        <Border Name="LogCard" Grid.Row="2" Grid.Column="1" Classes="card">
+          <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Name="LLog" Classes="h2"/>
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                <Button Name="ClearLogBtn" Classes="sm" Click="OnClearLog"><StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconTrash}"/><TextBlock Name="LClear"/></StackPanel></Button>
+                <Button Name="CopyLogBtn" Classes="sm" Click="OnCopyLog"><StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconCopy}"/><TextBlock Name="LCopyLog"/></StackPanel></Button>
+                <Button Name="SaveLogBtn" Classes="sm" Click="OnSaveLog"><StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconSave}"/><TextBlock Name="LSaveLog"/></StackPanel></Button>
+              </StackPanel>
+            </Grid>
+            <WrapPanel Grid.Row="1" Name="LogFilters" Orientation="Horizontal" ItemSpacing="6" LineSpacing="6">
+              <Button Name="ChipAll" Classes="chip on" Tag="all" Click="OnChip"/>
+              <Button Name="ChipInfo" Classes="chip info" Tag="info" Click="OnChip"/>
+              <Button Name="ChipTx" Classes="chip tx" Tag="tx" Click="OnChip"/>
+              <Button Name="ChipRx" Classes="chip rx" Tag="rx" Click="OnChip"/>
+              <Button Name="ChipWarn" Classes="chip warn" Tag="warn" Click="OnChip"/>
+              <Button Name="ChipError" Classes="chip error" Tag="error" Click="OnChip"/>
+              <Grid Name="SearchWrap" Width="170">
+                <TextBox Name="LogSearch" Classes="search" TextChanged="OnLogSearch"/>
+                <Path Classes="ico muted sm" Data="{StaticResource IconSearch}" HorizontalAlignment="Left" Margin="9,0,0,0" IsHitTestVisible="False"/>
+              </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <ToggleSwitch Name="AutoScroll" IsChecked="True" OnContent="" OffContent="" IsCheckedChanged="OnAutoScroll"/>
+                <TextBlock Name="LAutoScroll" Classes="swlabel" FontSize="12" VerticalAlignment="Center"/>
+              </StackPanel>
+            </WrapPanel>
+            <Border Grid.Row="2" Classes="logbox">
+              <ScrollViewer Name="LogScroll">
+                <StackPanel Name="LogRows"/>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </Border>
+
+        <!-- ===== Sozlamalar ===== -->
+        <Border Name="SettingsCard" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="2" Classes="card" IsVisible="False" MaxWidth="760" VerticalAlignment="Top">
+          <StackPanel>
+            <TextBlock Name="LSettings" Classes="h2" Margin="0,0,0,8"/>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSLang" Classes="stitle"/><TextBlock Name="LSLangSub" Classes="ssub"/></StackPanel>
+              <Border Grid.Column="1" Classes="seg" VerticalAlignment="Center"><StackPanel Orientation="Horizontal" Spacing="2">
+                <Button Name="SLangUz" Content="O'zbekcha" Tag="uz" Click="OnLangButton"/><Button Name="SLangRu" Content="Русский" Tag="ru" Click="OnLangButton"/><Button Name="SLangEn" Content="English" Tag="en" Click="OnLangButton"/>
+              </StackPanel></Border>
+            </Grid></Border>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSTheme" Classes="stitle"/><TextBlock Name="LSThemeSub" Classes="ssub"/></StackPanel>
+              <Border Grid.Column="1" Classes="seg" VerticalAlignment="Center"><StackPanel Orientation="Horizontal" Spacing="2">
+                <Button Name="SThemeLight" Tag="light" Click="OnThemeButton"/><Button Name="SThemeDark" Tag="dark" Click="OnThemeButton"/>
+              </StackPanel></Border>
+            </Grid></Border>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSSound" Classes="stitle"/><TextBlock Name="LSSoundSub" Classes="ssub"/></StackPanel>
+              <ToggleSwitch Grid.Column="1" Name="SoundSwitch" OnContent="" OffContent="" IsCheckedChanged="OnSoundSwitch" VerticalAlignment="Center"/>
+            </Grid></Border>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSAutofill" Classes="stitle"/><TextBlock Name="LSAutofillSub" Classes="ssub"/></StackPanel>
+              <ToggleSwitch Grid.Column="1" Name="AutofillSwitch" OnContent="" OffContent="" IsCheckedChanged="OnSettingChanged" VerticalAlignment="Center"/>
+            </Grid></Border>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSTimeout" Classes="stitle"/><TextBlock Name="LSTimeoutSub" Classes="ssub"/></StackPanel>
+              <ComboBox Grid.Column="1" Name="TimeoutBox" Width="120" VerticalAlignment="Center" SelectionChanged="OnSettingChanged"/>
+            </Grid></Border>
+            <Border Classes="srow"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSAutoconnect" Classes="stitle"/><TextBlock Name="LSAutoconnectSub" Classes="ssub"/></StackPanel>
+              <ToggleSwitch Grid.Column="1" Name="AutoconnectSwitch" OnContent="" OffContent="" IsCheckedChanged="OnSettingChanged" VerticalAlignment="Center"/>
+            </Grid></Border>
+            <Border Classes="srow" BorderThickness="0"><Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel><TextBlock Name="LSReset" Classes="stitle"/><TextBlock Name="LSResetSub" Classes="ssub"/></StackPanel>
+              <Button Grid.Column="1" Name="ResetSettingsBtn" Classes="sm" VerticalAlignment="Center" Click="OnResetSettings"><StackPanel Orientation="Horizontal"><Path Classes="ico sm" Data="{StaticResource IconRefresh}"/><TextBlock Name="LSResetBtn"/></StackPanel></Button>
+            </Grid></Border>
+          </StackPanel>
+        </Border>
+
+        <!-- ===== Yordam ===== -->
+        <Border Name="HelpCard" Grid.Row="0" Grid.RowSpan="3" Grid.ColumnSpan="2" Classes="card" IsVisible="False">
+          <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Name="LHelp" Classes="h2"/>
+              <Border Grid.Column="1" Classes="badge"><TextBlock Text="F1"/></Border>
+            </Grid>
+            <Grid Grid.Row="1" ColumnDefinitions="300,*" ColumnSpacing="16">
+              <Border Classes="aboutbox" VerticalAlignment="Top">
+                <StackPanel Spacing="12">
+                  <Image Name="AboutLogo" Height="40" HorizontalAlignment="Left" Source="/Assets/logo_dark.png"/>
+                  <TextBlock Name="AboutText" TextWrapping="Wrap" FontSize="12.5" LineHeight="20"/>
+                </StackPanel>
+              </Border>
+              <StackPanel Grid.Column="1" Spacing="8">
+                <TextBlock Name="LProtocol" FontSize="14" FontWeight="Bold"/>
+                <ScrollViewer Name="ProtoScroll"><SelectableTextBlock Name="ProtocolBody" Classes="proto" TextWrapping="Wrap"/></ScrollViewer>
+              </StackPanel>
+            </Grid>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+
+    <!-- ===== Holat paneli ===== -->
+    <Border Grid.Row="3" Classes="statusbar">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="18">
+          <StackPanel Orientation="Horizontal" Spacing="7"><Ellipse Name="StatusConnDot" Classes="sdot"/><TextBlock Name="StatusConn"/></StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="7"><Path Classes="ico muted sm" Data="{StaticResource IconUsb}"/><TextBlock Name="StatusPort" Text="—"/></StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="7"><Path Classes="ico muted sm" Data="{StaticResource IconSpeed}"/><TextBlock Name="StatusBaud" Text="9600 baud"/></StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="18">
+          <TextBlock Name="Clock" Classes="muted"/>
+          <StackPanel Orientation="Horizontal" Spacing="7"><Ellipse Name="StatusDot" Classes="sdot ok"/><TextBlock Name="StatusText"/></StackPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

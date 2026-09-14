@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="uz" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Uz-Meter</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== Splash (kirish animatsiyasi) ===== -->
+  <div id="splash" class="splash">
+    <div class="splash-glow"></div>
+    <div class="splash-grid"></div>
+    <div class="splash-logo">
+      <div class="ripples"><i></i><i></i><i></i></div>
+      <img class="splash-mark" src="assets/mark.png" alt="" draggable="false" />
+      <img class="splash-word" src="assets/word.png" alt="UZMETER" draggable="false" />
+    </div>
+    <div class="splash-tag" data-i18n="app_subtitle"></div>
+    <div class="splash-bar"><i></i></div>
+    <div class="splash-skip" data-i18n="splash_skip"></div>
+  </div>
+
+  <!-- ===== SVG ikonkalar ===== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></symbol>
+      <symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+      <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 7V3M15 7V3"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v4"/></symbol>
+      <symbol id="i-unplug" viewBox="0 0 24 24"><path d="M9 7V3M15 7V3"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v4"/><path d="M3 3l18 18"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.4"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12"/><path d="M6 10l6 6 6-6"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.5c3 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 3-6.5 6-10.5z"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></symbol>
+      <symbol id="i-batt" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2"/><path d="M22 11v2"/><rect x="4.5" y="9.5" width="9" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v5M14 11v5"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14h6M9 17h6"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 40 20"><path d="M1 15 8 11l6 4 7-9 6 5 5-3 6 6"/></symbol>
+      <symbol id="i-pulse" viewBox="0 0 40 20"><path d="M1 10h8l3-8 5 16 4-12 3 4h15"/></symbol>
+      <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v15"/><circle cx="12" cy="20" r="1.5"/><path d="M12 8l4-2v3"/><path d="M12 12l-4-2V7"/><path d="M12 3l-2 3h4z" fill="currentColor"/></symbol>
+      <symbol id="i-speed" viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/><circle cx="12" cy="16" r="1.5"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ===== Ilova ===== -->
+  <div id="app" class="app">
+
+    <!-- ---- yuqori panel ---- -->
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/app-icon.png" alt="" class="brand-icon" draggable="false" />
+        <div class="brand-text">
+          <div class="brand-title">Uz-Meter <span class="ver">v1.0</span></div>
+          <div class="brand-sub" data-i18n="app_subtitle"></div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="seg" id="langSeg">
+          <button data-lang="uz">UZ</button>
+          <button data-lang="ru">RU</button>
+          <button data-lang="en">EN</button>
+        </div>
+        <div class="seg icons" id="themeSeg">
+          <button data-theme="light" data-i18n-title="theme_light"><svg><use href="#i-sun"/></svg></button>
+          <button data-theme="dark" data-i18n-title="theme_dark"><svg><use href="#i-moon"/></svg></button>
+        </div>
+        <span class="vsep"></span>
+        <button class="icon-btn ghost" id="settingsBtn" data-view="settings" data-i18n-title="nav_settings"><svg><use href="#i-cog"/></svg></button>
+        <button class="icon-btn ghost" id="helpBtn" data-view="help" data-i18n-title="nav_help"><svg><use href="#i-help"/></svg></button>
+      </div>
+    </header>
+
+    <!-- ---- yon panel ---- -->
+    <nav class="sidebar" id="sidebar">
+      <button class="nav active" data-view="home"><svg><use href="#i-home"/></svg><span data-i18n="nav_home"></span></button>
+      <button class="nav" data-view="config"><svg><use href="#i-cog"/></svg><span data-i18n="nav_config"></span></button>
+      <button class="nav" data-view="device"><svg><use href="#i-doc"/></svg><span data-i18n="nav_device"></span></button>
+      <button class="nav" data-view="log"><svg><use href="#i-list"/></svg><span data-i18n="nav_log"></span><b class="nav-badge" id="navLogCount" hidden>0</b></button>
+      <button class="nav" data-view="settings"><svg><use href="#i-cog"/></svg><span data-i18n="nav_settings"></span></button>
+      <button class="nav" data-view="help"><svg><use href="#i-help"/></svg><span data-i18n="nav_help"></span></button>
+      <div class="side-foot">
+        <div class="tagline" data-i18n="tagline"></div>
+        <svg class="side-art" viewBox="0 0 200 120" aria-hidden="true">
+          <path d="M-10 70 C 30 40, 70 100, 110 70 S 190 40, 230 70 L 230 130 L -10 130 Z" fill="var(--decor-1)"/>
+          <path d="M-10 90 C 40 60, 80 120, 130 90 S 200 60, 230 90 L 230 130 L -10 130 Z" fill="var(--decor-2)"/>
+          <path d="M150 105 C 150 80, 165 62, 190 58 C 190 84, 175 100, 150 105 Z" fill="var(--decor-leaf)"/>
+          <path d="M150 105 C 165 90, 175 78, 188 62" stroke="var(--decor-vein)" stroke-width="1.2" fill="none"/>
+          <path d="M136 112 C 132 96, 138 82, 154 74 C 158 92, 150 106, 136 112 Z" fill="var(--decor-leaf2)"/>
+        </svg>
+      </div>
+    </nav>
+
+    <!-- ---- asosiy maydon ---- -->
+    <main class="main" id="main" data-view="home">
+
+      <!-- ulanish paneli -->
+      <section class="card connbar" id="connbar">
+        <div class="conn-state">
+          <span class="conn-dot" id="connDot"></span>
+          <div>
+            <div class="conn-title" id="connTitle"></div>
+            <div class="conn-sub" id="connSub"></div>
+          </div>
+        </div>
+        <div class="conn-field">
+          <label data-i18n="port"></label>
+          <select id="portSel"></select>
+        </div>
+        <button class="btn" id="refreshBtn"><svg><use href="#i-refresh"/></svg><span data-i18n="refresh"></span></button>
+        <div class="conn-field baud">
+          <label data-i18n="baud"></label>
+          <select id="baudSel">
+            <option>1200</option><option>2400</option><option>4800</option><option selected>9600</option>
+            <option>19200</option><option>38400</option><option>57600</option><option>115200</option>
+          </select>
+        </div>
+        <div class="conn-action">
+          <button class="btn primary" id="connectBtn"><svg><use href="#i-plug"/></svg><span data-i18n="connect"></span></button>
+          <button class="btn danger" id="disconnectBtn" hidden><svg><use href="#i-unplug"/></svg><span data-i18n="disconnect"></span></button>
+          <div class="conn-since" id="connSince">&nbsp;</div>
+        </div>
+      </section>
+
+      <!-- ===== Konfiguratsiya ===== -->
+      <section class="card config-card" id="configCard">
+        <div class="card-head">
+          <h2 data-i18n="config_title"></h2>
+          <span class="badge">CMD 0x01</span>
+        </div>
+
+        <div class="form">
+          <div class="sec"><i>1</i><span data-i18n="sec_ident"></span></div>
+          <div class="two">
+            <div class="field">
+              <label for="deviceNo"><span data-i18n="device_no"></span><em>*</em></label>
+              <div class="input-wrap">
+                <input id="deviceNo" inputmode="numeric" maxlength="15" placeholder="000000000000000" autocomplete="off" />
+                <span class="counter in" data-cnt="deviceNo"></span>
+                <svg class="valid-ico"><use href="#i-check"/></svg>
+              </div>
+              <div class="field-foot"><span class="hint" data-i18n="hint_device_no"></span><span class="counter" data-cnt="deviceNo">0 / 15</span></div>
+            </div>
+            <div class="field">
+              <label for="mNo"><span data-i18n="m_no"></span><em>*</em></label>
+              <div class="input-wrap">
+                <input id="mNo" inputmode="numeric" maxlength="14" placeholder="00000000000000" autocomplete="off" />
+                <span class="counter in" data-cnt="mNo"></span>
+                <svg class="valid-ico"><use href="#i-check"/></svg>
+              </div>
+              <div class="field-foot"><span class="hint" data-i18n="hint_m_no"></span><span class="counter" data-cnt="mNo">0 / 14</span></div>
+            </div>
+          </div>
+
+          <div class="sec"><i>2</i><span data-i18n="sec_server"></span></div>
+          <div class="field">
+            <label for="serverUrl"><span data-i18n="server_url"></span><em>*</em></label>
+            <div class="input-row">
+              <div class="input-wrap grow">
+                <input id="serverUrl" class="url" maxlength="128" placeholder="https://example.uz/api" autocomplete="off" spellcheck="false" />
+                <span class="counter in" data-cnt="serverUrl"></span>
+                <svg class="valid-ico"><use href="#i-check"/></svg>
+              </div>
+              <span class="info-ico" data-i18n-title="err_url"><svg><use href="#i-info"/></svg></span>
+            </div>
+            <div class="field-foot"><span class="hint" data-i18n="hint_url"></span><span class="counter" data-cnt="serverUrl">0 / 128</span></div>
+          </div>
+
+          <div class="sec"><i>3</i><span data-i18n="sec_params"></span></div>
+          <div class="two">
+            <div class="field">
+              <label><span data-i18n="valve"></span></label>
+              <div class="seg wide" id="valveSeg">
+                <button data-val="1" data-i18n="valve_open"></button>
+                <button data-val="0" data-i18n="valve_closed"></button>
+              </div>
+            </div>
+            <div class="field">
+              <label><span data-i18n="unit"></span></label>
+              <div class="seg wide" id="unitSeg">
+                <button data-val="0">1 L</button>
+                <button data-val="1">10 L</button>
+                <button data-val="2">100 L</button>
+                <button data-val="3">1000 L</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <div class="sec"><i>4</i><span data-i18n="sec_sending"></span></div>
+              <label for="sendsSel"><span data-i18n="sends"></span></label>
+              <select id="sendsSel"></select>
+            </div>
+            <div class="field">
+              <div class="sec"><i>5</i><span data-i18n="sec_type"></span></div>
+              <label for="typeSel"><span data-i18n="meter_type"></span></label>
+              <select id="typeSel"></select>
+            </div>
+          </div>
+
+          <div class="field frame">
+            <div class="frame-tools">
+              <label><span data-i18n="frame_preview"></span><small id="frameLen"></small></label>
+              <div class="seg" id="frameTabs">
+                <button data-tab="hex" class="active">HEX</button>
+                <button data-tab="struct" data-i18n="frame_struct"></button>
+              </div>
+              <span class="spacer"></span>
+              <button class="btn sm" id="copyHexBtn" data-i18n-title="copy"><svg><use href="#i-copy"/></svg><span data-i18n="copy"></span></button>
+              <button class="btn sm" id="recalcBtn" data-i18n-title="recalc"><svg><use href="#i-refresh"/></svg><span data-i18n="recalc"></span></button>
+            </div>
+            <pre class="hex" id="framePreview">—</pre>
+            <div class="struct" id="frameStruct" hidden></div>
+            <div class="note"><svg><use href="#i-info"/></svg><span data-i18n="frame_note"></span></div>
+          </div>
+
+          <button class="btn primary lg" id="sendBtn">
+            <svg><use href="#i-upload"/></svg>
+            <span data-i18n="send"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== Qurilma ma'lumotlari ===== -->
+      <section class="card device-card" id="deviceCard">
+        <div class="card-head">
+          <h2 data-i18n="device_data"></h2>
+          <span class="badge">CMD 0x02</span>
+        </div>
+        <div class="read-row">
+          <button class="btn accent" id="readBtn"><svg><use href="#i-download"/></svg><span data-i18n="read"></span></button>
+          <button class="btn" id="applyBtn" disabled><svg><use href="#i-doc"/></svg><span data-i18n="apply_to_form"></span></button>
+        </div>
+
+        <div class="tiles">
+          <div class="tile water">
+            <span class="tile-ico"><svg><use href="#i-drop"/></svg></span>
+            <div class="tile-body">
+              <div class="tile-label" data-i18n="water_volume"></div>
+              <div class="tile-value"><span id="tWater">—</span></div>
+              <div class="tile-unit">m³</div>
+            </div>
+            <svg class="tile-spark"><use href="#i-spark"/></svg>
+          </div>
+          <div class="tile volt">
+            <span class="tile-ico"><svg><use href="#i-bolt"/></svg></span>
+            <div class="tile-body">
+              <div class="tile-label" data-i18n="battery_v"></div>
+              <div class="tile-value"><span id="tBattV">—</span> <small>V</small></div>
+            </div>
+            <svg class="tile-spark"><use href="#i-pulse"/></svg>
+          </div>
+          <div class="tile batt">
+            <span class="tile-ico"><svg><use href="#i-batt"/></svg></span>
+            <div class="tile-body">
+              <div class="tile-label" data-i18n="battery_pct"></div>
+              <div class="tile-value"><span id="tBattP">—</span> <small>%</small></div>
+              <div class="bar"><div class="bar-fill" id="battBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dev-info" id="devInfo">
+          <span class="info-ico"><svg><use href="#i-info"/></svg></span>
+          <div class="info-grid">
+            <div class="k" data-i18n="device_no"></div><div class="v mono wide" id="dDeviceNo">—</div>
+            <div class="k" data-i18n="m_no"></div><div class="v mono wide" id="dMNo">—</div>
+            <div class="k" data-i18n="server_url"></div><div class="v mono wide" id="dUrl">—</div>
+            <div class="k" data-i18n="meter_type"></div><div class="v wide" id="dType">—</div>
+            <div class="k" data-i18n="valve"></div><div class="v" id="dValve">—</div>
+            <div class="k" data-i18n="unit"></div><div class="v" id="dUnit">—</div>
+            <div class="k" data-i18n="sends"></div><div class="v" id="dSends">—</div>
+            <div class="k" data-i18n="last_contact"></div><div class="v" id="dLast">—</div>
+            <div class="k" data-i18n="state"></div><div class="v wide"><span class="state-dot" id="stateDot"></span><span id="dState">—</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Aloqa jurnali ===== -->
+      <section class="card log-card" id="logCard">
+        <div class="card-head">
+          <h2 data-i18n="log_title"></h2>
+          <div class="head-tools">
+            <button class="btn sm" id="clearLogBtn"><svg><use href="#i-trash"/></svg><span data-i18n="clear"></span></button>
+            <button class="btn sm" id="copyLogBtn"><svg><use href="#i-copy"/></svg><span data-i18n="copy"></span></button>
+            <button class="btn sm" id="saveLogBtn"><svg><use href="#i-save"/></svg><span data-i18n="save_file"></span></button>
+          </div>
+        </div>
+        <div class="log-filters" id="logFilters">
+          <button class="chip active" data-level="all"><span data-i18n="log_all"></span> <span class="cnt">(<b id="cAll">0</b>)</span></button>
+          <button class="chip info" data-level="info">INFO <span class="cnt">(<b id="cInfo">0</b>)</span></button>
+          <button class="chip tx" data-level="tx">TX <span class="cnt">(<b id="cTx">0</b>)</span></button>
+          <button class="chip rx" data-level="rx">RX <span class="cnt">(<b id="cRx">0</b>)</span></button>
+          <button class="chip warn" data-level="warn">WARN <span class="cnt">(<b id="cWarn">0</b>)</span></button>
+          <button class="chip error" data-level="error">ERROR <span class="cnt">(<b id="cError">0</b>)</span></button>
+          <div class="search"><svg><use href="#i-search"/></svg><input id="logSearch" data-i18n-placeholder="search" /></div>
+          <label class="switch" data-i18n-title="autoscroll"><input type="checkbox" id="autoScroll" checked /><i></i><span class="sw-label" data-i18n="autoscroll"></span></label>
+        </div>
+        <div class="log" id="log"></div>
+      </section>
+
+      <!-- ===== Sozlamalar ===== -->
+      <section class="card settings-card" id="settingsCard">
+        <div class="card-head"><h2 data-i18n="nav_settings"></h2></div>
+        <div class="settings">
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_language"></div><div class="s-sub" data-i18n="s_language_sub"></div></div>
+            <div class="seg" id="langSeg2"><button data-lang="uz">O'zbekcha</button><button data-lang="ru">Русский</button><button data-lang="en">English</button></div>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_theme"></div><div class="s-sub" data-i18n="s_theme_sub"></div></div>
+            <div class="seg" id="themeSeg2"><button data-theme="light" data-i18n="theme_light"></button><button data-theme="dark" data-i18n="theme_dark"></button></div>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_sound"></div><div class="s-sub" data-i18n="s_sound_sub"></div></div>
+            <label class="switch"><input type="checkbox" id="soundChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_autofill"></div><div class="s-sub" data-i18n="s_autofill_sub"></div></div>
+            <label class="switch"><input type="checkbox" id="autofillChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_timeout"></div><div class="s-sub" data-i18n="s_timeout_sub"></div></div>
+            <select id="timeoutSel" class="narrow"><option value="1000">1 s</option><option value="2500">2.5 s</option><option value="5000">5 s</option><option value="10000">10 s</option></select>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_autoconnect"></div><div class="s-sub" data-i18n="s_autoconnect_sub"></div></div>
+            <label class="switch"><input type="checkbox" id="autoconnectChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_reset"></div><div class="s-sub" data-i18n="s_reset_sub"></div></div>
+            <button class="btn sm" id="resetSettingsBtn"><svg><use href="#i-refresh"/></svg><span data-i18n="s_reset_btn"></span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Yordam ===== -->
+      <section class="card help-card" id="helpCard">
+        <div class="card-head"><h2 data-i18n="nav_help"></h2><span class="badge">F1</span></div>
+        <div class="help">
+          <div class="help-about">
+            <img class="about-logo" id="aboutLogo" src="assets/logo.png" alt="UZMETER" draggable="false" />
+            <div class="about-text" data-i18n="about_text"></div>
+          </div>
+          <div class="help-proto">
+            <h3 data-i18n="protocol_title"></h3>
+            <div id="protocolBody"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ---- holat paneli ---- -->
+    <footer class="statusbar" id="statusbar">
+      <span class="s-item"><span class="s-dot" id="statusConnDot"></span><span id="statusConn"></span></span>
+      <span class="s-item"><svg><use href="#i-usb"/></svg><span id="statusPort">—</span></span>
+      <span class="s-item"><svg><use href="#i-speed"/></svg><span id="statusBaud">9600 baud</span></span>
+      <span class="spacer"></span>
+      <span class="s-item" id="clock"></span>
+      <span class="s-item"><span class="s-dot" id="statusDot"></span><span id="statusText"></span></span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

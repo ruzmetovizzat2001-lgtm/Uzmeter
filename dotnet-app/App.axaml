@@ -1,0 +1,527 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="UzMeter.App"
+             RequestedThemeVariant="Light">
+
+  <!-- Dizayn: yorug' mavzu, ko'k #2F7BF3 asosiy rang; qorong'i mavzu — to'q ko'k palitra -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="PrimaryBrush" Color="#2F7BF3"/>
+          <SolidColorBrush x:Key="Primary2Brush" Color="#1E66DD"/>
+          <SolidColorBrush x:Key="PrimarySoftBrush" Color="#E8F0FE"/>
+          <SolidColorBrush x:Key="SecBrush" Color="#EEF4FF"/>
+          <SolidColorBrush x:Key="SecTextBrush" Color="#1E66DD"/>
+          <SolidColorBrush x:Key="BgBrush" Color="#EEF3FA"/>
+          <SolidColorBrush x:Key="Bg2Brush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="SideBrush" Color="#F6F9FD"/>
+          <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="Card2Brush" Color="#F4F7FB"/>
+          <SolidColorBrush x:Key="FieldBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="LineBrush" Color="#DFE6F0"/>
+          <SolidColorBrush x:Key="Line2Brush" Color="#C9D5E5"/>
+          <SolidColorBrush x:Key="TextBrush" Color="#16203A"/>
+          <SolidColorBrush x:Key="MutedBrush" Color="#6B7A93"/>
+          <SolidColorBrush x:Key="InfoBrush" Color="#22A06B"/>
+          <SolidColorBrush x:Key="TxBrush" Color="#2F7BF3"/>
+          <SolidColorBrush x:Key="RxBrush" Color="#7C3AED"/>
+          <SolidColorBrush x:Key="StructBytesBrush" Color="#1E66DD"/>
+          <SolidColorBrush x:Key="Decor1Brush" Color="#1A2F7BF3"/>
+          <SolidColorBrush x:Key="Decor2Brush" Color="#292F7BF3"/>
+          <SolidColorBrush x:Key="DecorLeafBrush" Color="#472F7BF3"/>
+          <SolidColorBrush x:Key="DecorLeaf2Brush" Color="#2E2F7BF3"/>
+          <Color x:Key="ShadowColor">#1016203A</Color>
+          <LinearGradientBrush x:Key="NavActiveBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Color="#4A8EF8" Offset="0"/><GradientStop Color="#1E66DD" Offset="1"/>
+          </LinearGradientBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="PrimaryBrush" Color="#3D8BFF"/>
+          <SolidColorBrush x:Key="Primary2Brush" Color="#2F7BF3"/>
+          <SolidColorBrush x:Key="PrimarySoftBrush" Color="#293D8BFF"/>
+          <SolidColorBrush x:Key="SecBrush" Color="#16223A"/>
+          <SolidColorBrush x:Key="SecTextBrush" Color="#8FBAFF"/>
+          <SolidColorBrush x:Key="BgBrush" Color="#0A1020"/>
+          <SolidColorBrush x:Key="Bg2Brush" Color="#0E1628"/>
+          <SolidColorBrush x:Key="SideBrush" Color="#0C1425"/>
+          <SolidColorBrush x:Key="CardBrush" Color="#111A2E"/>
+          <SolidColorBrush x:Key="Card2Brush" Color="#172238"/>
+          <SolidColorBrush x:Key="FieldBrush" Color="#0F1829"/>
+          <SolidColorBrush x:Key="LineBrush" Color="#223050"/>
+          <SolidColorBrush x:Key="Line2Brush" Color="#2C3D61"/>
+          <SolidColorBrush x:Key="TextBrush" Color="#E9EEF8"/>
+          <SolidColorBrush x:Key="MutedBrush" Color="#8A9BB8"/>
+          <SolidColorBrush x:Key="InfoBrush" Color="#34D399"/>
+          <SolidColorBrush x:Key="TxBrush" Color="#5EA1FF"/>
+          <SolidColorBrush x:Key="RxBrush" Color="#A78BFA"/>
+          <SolidColorBrush x:Key="StructBytesBrush" Color="#8FBAFF"/>
+          <SolidColorBrush x:Key="Decor1Brush" Color="#1A3D8BFF"/>
+          <SolidColorBrush x:Key="Decor2Brush" Color="#293D8BFF"/>
+          <SolidColorBrush x:Key="DecorLeafBrush" Color="#4D3D8BFF"/>
+          <SolidColorBrush x:Key="DecorLeaf2Brush" Color="#2E3D8BFF"/>
+          <Color x:Key="ShadowColor">#59000000</Color>
+          <LinearGradientBrush x:Key="NavActiveBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Color="#4A8EF8" Offset="0"/><GradientStop Color="#2F7BF3" Offset="1"/>
+          </LinearGradientBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <SolidColorBrush x:Key="OkBrush" Color="#17B978"/>
+      <SolidColorBrush x:Key="Ok2Brush" Color="#0F9D63"/>
+      <SolidColorBrush x:Key="DangerBrush" Color="#EF4458"/>
+      <SolidColorBrush x:Key="Danger2Brush" Color="#D92F43"/>
+      <SolidColorBrush x:Key="WarnBrush" Color="#F59E0B"/>
+      <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFF"/>
+      <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#4A8EF8" Offset="0"/><GradientStop Color="#1E66DD" Offset="1"/>
+      </LinearGradientBrush>
+      <LinearGradientBrush x:Key="OkGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#1CC98A" Offset="0"/><GradientStop Color="#0F9D63" Offset="1"/>
+      </LinearGradientBrush>
+      <LinearGradientBrush x:Key="DangerGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#F5566A" Offset="0"/><GradientStop Color="#D92F43" Offset="1"/>
+      </LinearGradientBrush>
+      <FontFamily x:Key="MonoFont">Cascadia Code, JetBrains Mono, Consolas, Menlo, monospace</FontFamily>
+
+      <!-- ikonkalar (Feather uslubi, 24x24) -->
+      <StreamGeometry x:Key="IconHome">M3 10.5 12 3l9 7.5 M5 9.5V21h14V9.5 M10 21v-6h4v6</StreamGeometry>
+      <StreamGeometry x:Key="IconCog">M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z</StreamGeometry>
+      <StreamGeometry x:Key="IconDoc">M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5 M9 13h6 M9 17h6</StreamGeometry>
+      <StreamGeometry x:Key="IconList">M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01</StreamGeometry>
+      <StreamGeometry x:Key="IconHelp">M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7 M12 17h.01</StreamGeometry>
+      <StreamGeometry x:Key="IconSun">M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M12 2v2 M12 20v2 M4.9 4.9l1.4 1.4 M17.7 17.7l1.4 1.4 M2 12h2 M20 12h2 M4.9 19.1l1.4-1.4 M17.7 6.3l1.4-1.4</StreamGeometry>
+      <StreamGeometry x:Key="IconMoon">M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z</StreamGeometry>
+      <StreamGeometry x:Key="IconRefresh">M21 12a9 9 0 1 1-2.6-6.4 M21 3v6h-6</StreamGeometry>
+      <StreamGeometry x:Key="IconPlug">M9 7V3 M15 7V3 M6 7h12v4a6 6 0 0 1-12 0z M12 17v4</StreamGeometry>
+      <StreamGeometry x:Key="IconUnplug">M9 7V3 M15 7V3 M6 7h12v4a6 6 0 0 1-12 0z M12 17v4 M3 3l18 18</StreamGeometry>
+      <StreamGeometry x:Key="IconInfo">M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M12 16v-5 M12 8h.01</StreamGeometry>
+      <StreamGeometry x:Key="IconCopy">M11 9h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z M5 15V5a2 2 0 0 1 2-2h10</StreamGeometry>
+      <StreamGeometry x:Key="IconUpload">M12 16V4 M6 10l6-6 6 6 M4 20h16</StreamGeometry>
+      <StreamGeometry x:Key="IconDownload">M12 4v12 M6 10l6 6 6-6 M4 20h16</StreamGeometry>
+      <StreamGeometry x:Key="IconDrop">M12 2.5c3 4 6 7.2 6 10.5a6 6 0 0 1-12 0c0-3.3 3-6.5 6-10.5z</StreamGeometry>
+      <StreamGeometry x:Key="IconBolt">M13 2 3 14h8l-1 8 10-12h-8z</StreamGeometry>
+      <StreamGeometry x:Key="IconBatt">M4 7h13a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z M22 11v2</StreamGeometry>
+      <StreamGeometry x:Key="IconBattFill">M5 10h8v4H5z</StreamGeometry>
+      <StreamGeometry x:Key="IconTrash">M3 6h18 M8 6V4h8v2 M6 6l1 14h10l1-14 M10 11v5 M14 11v5</StreamGeometry>
+      <StreamGeometry x:Key="IconSave">M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z M14 3v5h5 M9 14h6 M9 17h6</StreamGeometry>
+      <StreamGeometry x:Key="IconSearch">M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M20 20l-3.5-3.5</StreamGeometry>
+      <StreamGeometry x:Key="IconUsb">M12 3v15 M12 8l4-2v3 M12 12l-4-2V7 M10 6l2-3 2 3z</StreamGeometry>
+      <StreamGeometry x:Key="IconSpeed">M4 16a8 8 0 1 1 16 0 M12 16l4-5</StreamGeometry>
+      <StreamGeometry x:Key="IconCheck">M8 12.5l2.5 2.5L16 9.5</StreamGeometry>
+      <StreamGeometry x:Key="IconSpark">M1 15 8 11l6 4 7-9 6 5 5-3 6 6</StreamGeometry>
+      <StreamGeometry x:Key="IconPulse">M1 10h8l3-8 5 16 4-12 3 4h15</StreamGeometry>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <!-- ===== umumiy ===== -->
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource BgBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+      <Setter Property="FontFamily" Value="fonts:Inter#Inter"/>
+      <Setter Property="FontSize" Value="13"/>
+    </Style>
+    <Style Selector="TextBlock"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+    <Style Selector="Path.ico">
+      <Setter Property="Stroke" Value="{DynamicResource TextBrush}"/>
+      <Setter Property="StrokeThickness" Value="1.8"/>
+      <Setter Property="StrokeLineCap" Value="Round"/>
+      <Setter Property="StrokeJoin" Value="Round"/>
+      <Setter Property="Width" Value="16"/><Setter Property="Height" Value="16"/>
+      <Setter Property="Stretch" Value="Uniform"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Path.ico.muted"><Setter Property="Stroke" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Path.ico.primary"><Setter Property="Stroke" Value="{DynamicResource PrimaryBrush}"/></Style>
+    <Style Selector="Path.ico.white"><Setter Property="Stroke" Value="White"/></Style>
+    <Style Selector="Path.ico.sm"><Setter Property="Width" Value="14"/><Setter Property="Height" Value="14"/></Style>
+
+    <Style Selector="Menu"><Setter Property="Background" Value="{DynamicResource Bg2Brush}"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+
+    <!-- ===== yuqori panel ===== -->
+    <Style Selector="Border.topbar">
+      <Setter Property="Background" Value="{DynamicResource Bg2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="0,0,0,1"/>
+      <Setter Property="Padding" Value="16,0"/>
+      <Setter Property="Height" Value="58"/>
+    </Style>
+    <Style Selector="Border.appicon">
+      <Setter Property="Width" Value="40"/><Setter Property="Height" Value="40"/>
+      <Setter Property="CornerRadius" Value="11"/>
+      <Setter Property="ClipToBounds" Value="True"/>
+      <Setter Property="BoxShadow" Value="0 4 12 0 #380A1020"/>
+    </Style>
+    <Style Selector="TextBlock.title"><Setter Property="FontSize" Value="19"/><Setter Property="FontWeight" Value="ExtraBold"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Border.ver">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="999"/>
+      <Setter Property="Padding" Value="7,1"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.ver TextBlock"><Setter Property="FontSize" Value="10.5"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="TextBlock.sub"><Setter Property="FontSize" Value="11.5"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Border.vsep"><Setter Property="Width" Value="1"/><Setter Property="Height" Value="24"/><Setter Property="Background" Value="{DynamicResource Line2Brush}"/><Setter Property="Margin" Value="4,0"/></Style>
+
+    <!-- ===== yon panel ===== -->
+    <Style Selector="Border.sidebar">
+      <Setter Property="Background" Value="{DynamicResource SideBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="0,0,1,0"/>
+      <Setter Property="Padding" Value="10,14"/>
+      <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+    <Style Selector="Button.nav">
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="MinHeight" Value="42"/>
+      <Setter Property="Padding" Value="14,0"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+      <Setter Property="FontWeight" Value="Medium"/>
+      <Setter Property="FontSize" Value="13.5"/>
+    </Style>
+    <Style Selector="Button.nav:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource Card2Brush}"/></Style>
+    <Style Selector="Button.nav Path.ico"><Setter Property="Stroke" Value="{DynamicResource MutedBrush}"/><Setter Property="Width" Value="18"/><Setter Property="Height" Value="18"/></Style>
+    <Style Selector="Button.nav.on"><Setter Property="Background" Value="{DynamicResource NavActiveBrush}"/><Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+    <Style Selector="Button.nav.on:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource NavActiveBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.nav.on Path.ico"><Setter Property="Stroke" Value="White"/></Style>
+    <Style Selector="Button.nav TextBlock"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Button.nav.on TextBlock"><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Border.navbadge">
+      <Setter Property="Background" Value="{DynamicResource PrimarySoftBrush}"/>
+      <Setter Property="CornerRadius" Value="999"/>
+      <Setter Property="Padding" Value="7,1"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
+    <Style Selector="Border.navbadge TextBlock"><Setter Property="FontSize" Value="10.5"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/></Style>
+    <Style Selector="Button.nav.on Border.navbadge"><Setter Property="Background" Value="#38FFFFFF"/></Style>
+    <Style Selector="Button.nav.on Border.navbadge TextBlock"><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="TextBlock.tagline"><Setter Property="FontStyle" Value="Italic"/><Setter Property="FontSize" Value="13"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+
+    <!-- ===== holat paneli ===== -->
+    <Style Selector="Border.statusbar">
+      <Setter Property="Background" Value="{DynamicResource Bg2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="0,1,0,0"/>
+      <Setter Property="Padding" Value="16,0"/>
+      <Setter Property="Height" Value="30"/>
+    </Style>
+    <Style Selector="Border.statusbar TextBlock"><Setter Property="FontSize" Value="12"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Border.statusbar TextBlock.muted"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Ellipse.sdot"><Setter Property="Width" Value="9"/><Setter Property="Height" Value="9"/><Setter Property="Fill" Value="{DynamicResource MutedBrush}"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Ellipse.sdot.ok"><Setter Property="Fill" Value="{StaticResource OkBrush}"/></Style>
+    <Style Selector="Ellipse.sdot.err"><Setter Property="Fill" Value="{StaticResource DangerBrush}"/></Style>
+    <Style Selector="Ellipse.sdot.warn"><Setter Property="Fill" Value="{StaticResource WarnBrush}"/></Style>
+
+    <!-- ===== kartalar ===== -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="14"/>
+      <Setter Property="Padding" Value="16,12"/>
+      <Setter Property="BoxShadow" Value="0 6 20 0 #0F16203A"/>
+    </Style>
+    <Style Selector="TextBlock.h2"><Setter Property="FontSize" Value="16"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="TextBlock.muted"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Border.badge">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="7"/>
+      <Setter Property="Padding" Value="9,3"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.badge TextBlock"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="FontSize" Value="10.5"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+
+    <!-- ulanish paneli -->
+    <Style Selector="Ellipse.conndot"><Setter Property="Width" Value="16"/><Setter Property="Height" Value="16"/><Setter Property="Fill" Value="{DynamicResource MutedBrush}"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Ellipse.conndot.on"><Setter Property="Fill" Value="{StaticResource OkBrush}"/></Style>
+    <Style Selector="Ellipse.conndot.busy"><Setter Property="Fill" Value="{StaticResource WarnBrush}"/></Style>
+    <Style Selector="Ellipse.connring"><Setter Property="Width" Value="26"/><Setter Property="Height" Value="26"/><Setter Property="Fill" Value="#266B7A93"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Ellipse.connring.on"><Setter Property="Fill" Value="#2E17B978"/></Style>
+    <Style Selector="Ellipse.connring.busy"><Setter Property="Fill" Value="#33F59E0B"/></Style>
+    <Style Selector="TextBlock.conntitle"><Setter Property="FontSize" Value="15"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="TextBlock.conntitle.on"><Setter Property="Foreground" Value="{StaticResource Ok2Brush}"/></Style>
+    <Style Selector="TextBlock.label"><Setter Property="FontSize" Value="12"/><Setter Property="FontWeight" Value="Medium"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="Margin" Value="0,0,0,3"/></Style>
+    <Style Selector="TextBlock.label.muted"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="TextBlock.req"><Setter Property="Foreground" Value="{StaticResource DangerBrush}"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Margin" Value="3,0,0,3"/><Setter Property="FontSize" Value="12"/></Style>
+    <Style Selector="TextBlock.hint"><Setter Property="FontSize" Value="11"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="TextTrimming" Value="CharacterEllipsis"/></Style>
+    <Style Selector="TextBlock.tiny"><Setter Property="FontSize" Value="11"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+
+    <!-- bo'lim sarlavhasi (raqamli) -->
+    <Style Selector="Border.sec">
+      <Setter Property="Background" Value="{DynamicResource SecBrush}"/>
+      <Setter Property="CornerRadius" Value="7"/>
+      <Setter Property="Height" Value="23"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+    <Style Selector="Border.sec Border.num">
+      <Setter Property="Width" Value="18"/><Setter Property="Height" Value="18"/>
+      <Setter Property="CornerRadius" Value="9"/>
+      <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+      <Setter Property="Margin" Value="0,0,8,0"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.sec Border.num TextBlock"><Setter Property="FontSize" Value="10.5"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Foreground" Value="White"/><Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Border.sec TextBlock.sectitle"><Setter Property="FontSize" Value="12.5"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="Foreground" Value="{DynamicResource SecTextBrush}"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+
+    <!-- ===== inputlar ===== -->
+    <Style Selector="TextBox">
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Background" Value="{DynamicResource FieldBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Line2Brush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+    <Style Selector="TextBox.invalid"><Setter Property="BorderBrush" Value="{StaticResource DangerBrush}"/></Style>
+    <Style Selector="TextBox.mono"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/></Style>
+    <Style Selector="ComboBox">
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Height" Value="32"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Background" Value="{DynamicResource FieldBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Line2Brush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.counter">
+      <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+      <Setter Property="FontSize" Value="10.5"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+    <Style Selector="TextBlock.counter.ok"><Setter Property="Foreground" Value="{StaticResource Ok2Brush}"/></Style>
+    <Style Selector="TextBlock.counter.in"><Setter Property="IsVisible" Value="False"/><Setter Property="FontSize" Value="10"/></Style>
+    <Style Selector="Border.checkico">
+      <Setter Property="Width" Value="18"/><Setter Property="Height" Value="18"/>
+      <Setter Property="CornerRadius" Value="9"/>
+      <Setter Property="Background" Value="{StaticResource OkBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="Margin" Value="0,0,9,0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+    <Style Selector="Border.checkico Path"><Setter Property="Stroke" Value="White"/><Setter Property="StrokeThickness" Value="2.4"/><Setter Property="StrokeLineCap" Value="Round"/><Setter Property="StrokeJoin" Value="Round"/><Setter Property="Width" Value="10"/><Setter Property="Height" Value="10"/><Setter Property="Stretch" Value="Uniform"/></Style>
+
+    <!-- ===== tugmalar ===== -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="9"/>
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="Height" Value="36"/>
+      <Setter Property="Padding" Value="14,0"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Line2Brush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Background" Value="{DynamicResource CardBrush}"/></Style>
+    <Style Selector="Button TextBlock"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Button.lg"><Setter Property="MinHeight" Value="40"/><Setter Property="Height" Value="40"/><Setter Property="FontSize" Value="14"/></Style>
+    <Style Selector="Button.md"><Setter Property="MinHeight" Value="40"/><Setter Property="Height" Value="40"/></Style>
+    <Style Selector="Button.sm"><Setter Property="MinHeight" Value="30"/><Setter Property="Height" Value="30"/><Setter Property="Padding" Value="10,0"/><Setter Property="FontSize" Value="12"/><Setter Property="CornerRadius" Value="8"/></Style>
+    <Style Selector="Button.icon"><Setter Property="Width" Value="34"/><Setter Property="MinHeight" Value="34"/><Setter Property="Height" Value="34"/><Setter Property="Padding" Value="0"/><Setter Property="CornerRadius" Value="9"/><Setter Property="Background" Value="Transparent"/><Setter Property="BorderBrush" Value="Transparent"/></Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource Card2Brush}"/><Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/></Style>
+    <Style Selector="Button.icon.on"><Setter Property="Background" Value="{DynamicResource PrimarySoftBrush}"/></Style>
+    <Style Selector="Button.icon.on Path.ico"><Setter Property="Stroke" Value="{DynamicResource PrimaryBrush}"/></Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="{StaticResource PrimaryGradient}"/><Setter Property="BorderBrush" Value="{DynamicResource Primary2Brush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.success"><Setter Property="Background" Value="{StaticResource OkGradient}"/><Setter Property="BorderBrush" Value="{StaticResource Ok2Brush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.success:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{StaticResource OkBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.danger"><Setter Property="Background" Value="{StaticResource DangerGradient}"/><Setter Property="BorderBrush" Value="{StaticResource Danger2Brush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{StaticResource DangerBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.primary TextBlock, Button.success TextBlock, Button.danger TextBlock"><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.primary Path.ico, Button.success Path.ico, Button.danger Path.ico"><Setter Property="Stroke" Value="White"/><Setter Property="StrokeThickness" Value="2.2"/></Style>
+    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Opacity" Value="0.5"/></Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{StaticResource PrimaryGradient}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.success:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{StaticResource OkGradient}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.danger:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{StaticResource DangerGradient}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button StackPanel > Path.ico"><Setter Property="Margin" Value="0,0,8,0"/></Style>
+
+    <!-- segment tugmalar -->
+    <Style Selector="Border.seg">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="9"/>
+      <Setter Property="Padding" Value="3"/>
+    </Style>
+    <Style Selector="Border.seg Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+      <Setter Property="MinHeight" Value="26"/>
+      <Setter Property="Height" Value="26"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style Selector="Border.seg Button:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+    <Style Selector="Border.seg Button.on"><Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Border.seg Button.on:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Border.seg Button Path.ico"><Setter Property="Stroke" Value="{DynamicResource MutedBrush}"/><Setter Property="Width" Value="15"/><Setter Property="Height" Value="15"/></Style>
+    <Style Selector="Border.seg Button.on Path.ico"><Setter Property="Stroke" Value="White"/></Style>
+    <Style Selector="Border.seg.wide"><Setter Property="Height" Value="32"/></Style>
+    <Style Selector="Border.seg.wide Button"><Setter Property="Height" Value="24"/><Setter Property="MinHeight" Value="24"/><Setter Property="FontSize" Value="12.5"/><Setter Property="Padding" Value="4,0"/></Style>
+
+    <!-- HEX / struktura -->
+    <Style Selector="Border.hexbox">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="MinHeight" Value="36"/>
+    </Style>
+    <Style Selector="Border.hexbox SelectableTextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="LineHeight" Value="19"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+    <Style Selector="Border.hexbox SelectableTextBlock.err"><Setter Property="Foreground" Value="{StaticResource DangerBrush}"/></Style>
+    <Style Selector="Grid.strow"><Setter Property="Height" Value="22"/></Style>
+    <Style Selector="Grid.strow TextBlock"><Setter Property="FontSize" Value="11.5"/><Setter Property="VerticalAlignment" Value="Center"/><Setter Property="Margin" Value="8,0"/><Setter Property="TextTrimming" Value="CharacterEllipsis"/></Style>
+    <Style Selector="Grid.strow.head TextBlock"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+    <Style Selector="Grid.strow TextBlock.n"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Grid.strow TextBlock.b"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="Foreground" Value="{DynamicResource StructBytesBrush}"/></Style>
+    <Style Selector="Grid.strow Border.line"><Setter Property="Height" Value="1"/><Setter Property="Background" Value="{DynamicResource LineBrush}"/><Setter Property="VerticalAlignment" Value="Bottom"/></Style>
+
+    <!-- ===== qurilma kartochkalari ===== -->
+    <Style Selector="Border.tile">
+      <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="10,9"/>
+      <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+    <Style Selector="Border.tileico"><Setter Property="Width" Value="34"/><Setter Property="Height" Value="34"/><Setter Property="CornerRadius" Value="17"/><Setter Property="VerticalAlignment" Value="Top"/><Setter Property="Margin" Value="0,0,8,0"/></Style>
+    <Style Selector="Border.tileico.water"><Setter Property="Background" Value="#1F2F7BF3"/></Style>
+    <Style Selector="Border.tileico.water Path"><Setter Property="Stroke" Value="{DynamicResource PrimaryBrush}"/></Style>
+    <Style Selector="Border.tileico.ok"><Setter Property="Background" Value="#2417B978"/></Style>
+    <Style Selector="Border.tileico.ok Path"><Setter Property="Stroke" Value="{StaticResource Ok2Brush}"/></Style>
+    <Style Selector="Border.tileico Path"><Setter Property="Width" Value="18"/><Setter Property="Height" Value="18"/></Style>
+    <Style Selector="TextBlock.tilelabel"><Setter Property="FontSize" Value="11.5"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="MaxLines" Value="2"/><Setter Property="TextTrimming" Value="CharacterEllipsis"/></Style>
+    <Style Selector="TextBlock.tilevalue"><Setter Property="FontSize" Value="21"/><Setter Property="FontWeight" Value="ExtraBold"/><Setter Property="Margin" Value="0,2,0,0"/></Style>
+    <Style Selector="TextBlock.tileunit"><Setter Property="FontSize" Value="12"/><Setter Property="FontWeight" Value="Bold"/><Setter Property="VerticalAlignment" Value="Bottom"/><Setter Property="Margin" Value="4,0,0,4"/></Style>
+    <Style Selector="Path.spark"><Setter Property="Stroke" Value="{DynamicResource PrimaryBrush}"/><Setter Property="StrokeThickness" Value="2"/><Setter Property="StrokeLineCap" Value="Round"/><Setter Property="StrokeJoin" Value="Round"/><Setter Property="Width" Value="36"/><Setter Property="Height" Value="18"/><Setter Property="Stretch" Value="Uniform"/><Setter Property="HorizontalAlignment" Value="Right"/><Setter Property="VerticalAlignment" Value="Bottom"/></Style>
+    <Style Selector="ProgressBar.batt">
+      <Setter Property="Height" Value="7"/><Setter Property="MinHeight" Value="7"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="Foreground" Value="{StaticResource OkBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource LineBrush}"/>
+    </Style>
+    <Style Selector="ProgressBar.batt.mid"><Setter Property="Foreground" Value="{StaticResource WarnBrush}"/></Style>
+    <Style Selector="ProgressBar.batt.low"><Setter Property="Foreground" Value="{StaticResource DangerBrush}"/></Style>
+
+    <Style Selector="Border.devinfo">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="12,8"/>
+    </Style>
+    <Style Selector="Grid.kv > TextBlock.k"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="FontSize" Value="12"/><Setter Property="Margin" Value="0,1,12,1"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Grid.kv > TextBlock.v"><Setter Property="FontSize" Value="12"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,1,12,1"/><Setter Property="TextTrimming" Value="CharacterEllipsis"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Grid.kv > TextBlock.v.mono"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="FontWeight" Value="Medium"/><Setter Property="FontSize" Value="11.5"/></Style>
+    <Style Selector="Grid.kv > TextBlock.v.empty"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="FontWeight" Value="Medium"/></Style>
+    <Style Selector="Ellipse.statedot"><Setter Property="Width" Value="8"/><Setter Property="Height" Value="8"/><Setter Property="Fill" Value="{DynamicResource MutedBrush}"/><Setter Property="Margin" Value="0,0,6,0"/><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    <Style Selector="Ellipse.statedot.ok"><Setter Property="Fill" Value="{StaticResource OkBrush}"/></Style>
+    <Style Selector="Ellipse.statedot.warn"><Setter Property="Fill" Value="{StaticResource WarnBrush}"/></Style>
+
+    <!-- ===== jurnal ===== -->
+    <Style Selector="Button.chip">
+      <Setter Property="MinHeight" Value="28"/><Setter Property="Height" Value="28"/>
+      <Setter Property="Padding" Value="9,0"/>
+      <Setter Property="CornerRadius" Value="7"/>
+      <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+      <Setter Property="FontSize" Value="11.5"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+    </Style>
+    <Style Selector="Button.chip.info"><Setter Property="Foreground" Value="{DynamicResource InfoBrush}"/></Style>
+    <Style Selector="Button.chip.tx"><Setter Property="Foreground" Value="{DynamicResource TxBrush}"/></Style>
+    <Style Selector="Button.chip.rx"><Setter Property="Foreground" Value="{DynamicResource RxBrush}"/></Style>
+    <Style Selector="Button.chip.warn"><Setter Property="Foreground" Value="{StaticResource WarnBrush}"/></Style>
+    <Style Selector="Button.chip.error"><Setter Property="Foreground" Value="{StaticResource DangerBrush}"/></Style>
+    <Style Selector="Button.chip.on"><Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="Button.chip.info.on"><Setter Property="Background" Value="{DynamicResource InfoBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}"/></Style>
+    <Style Selector="Button.chip.tx.on"><Setter Property="Background" Value="{DynamicResource TxBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource TxBrush}"/></Style>
+    <Style Selector="Button.chip.rx.on"><Setter Property="Background" Value="{DynamicResource RxBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource RxBrush}"/></Style>
+    <Style Selector="Button.chip.warn.on"><Setter Property="Background" Value="{StaticResource WarnBrush}"/><Setter Property="BorderBrush" Value="{StaticResource WarnBrush}"/></Style>
+    <Style Selector="Button.chip.error.on"><Setter Property="Background" Value="{StaticResource DangerBrush}"/><Setter Property="BorderBrush" Value="{StaticResource DangerBrush}"/></Style>
+    <Style Selector="Button.chip.on:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Foreground" Value="White"/></Style>
+    <Style Selector="TextBox.search"><Setter Property="MinHeight" Value="28"/><Setter Property="Height" Value="28"/><Setter Property="FontSize" Value="12"/><Setter Property="CornerRadius" Value="7"/><Setter Property="Padding" Value="28,0,8,0"/></Style>
+    <Style Selector="Border.logbox">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="9"/>
+      <Setter Property="Padding" Value="10,4"/>
+      <Setter Property="MinHeight" Value="40"/>
+    </Style>
+    <Style Selector="Grid.logrow TextBlock"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="FontSize" Value="11.5"/><Setter Property="LineHeight" Value="20"/><Setter Property="VerticalAlignment" Value="Top"/></Style>
+    <Style Selector="Grid.logrow TextBlock.t"><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/></Style>
+    <Style Selector="Grid.logrow TextBlock.lv"><Setter Property="FontWeight" Value="Bold"/></Style>
+    <Style Selector="Grid.logrow TextBlock.m"><Setter Property="TextWrapping" Value="Wrap"/></Style>
+    <Style Selector="ToggleSwitch"><Setter Property="MinWidth" Value="0"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+
+    <!-- ===== sozlamalar ===== -->
+    <Style Selector="Border.srow"><Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/><Setter Property="BorderThickness" Value="0,0,0,1"/><Setter Property="Padding" Value="4,12"/></Style>
+    <Style Selector="TextBlock.stitle"><Setter Property="FontSize" Value="13.5"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+    <Style Selector="TextBlock.ssub"><Setter Property="FontSize" Value="11.5"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="Margin" Value="0,2,0,0"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+
+    <!-- ===== yordam ===== -->
+    <Style Selector="Border.aboutbox">
+      <Setter Property="Background" Value="{DynamicResource Card2Brush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="Padding" Value="14"/>
+    </Style>
+    <Style Selector="SelectableTextBlock.proto"><Setter Property="FontFamily" Value="{StaticResource MonoFont}"/><Setter Property="FontSize" Value="12"/><Setter Property="LineHeight" Value="20"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+
+    <!-- ===== kichik oynalar (balandlik < 720) ===== -->
+    <Style Selector="Window.compact TextBlock.hint"><Setter Property="IsVisible" Value="False"/></Style>
+    <Style Selector="Window.compact StackPanel.note"><Setter Property="IsVisible" Value="False"/></Style>
+    <Style Selector="Window.compact TextBlock.counter.foot"><Setter Property="IsVisible" Value="False"/></Style>
+    <Style Selector="Window.compact TextBlock.counter.in"><Setter Property="IsVisible" Value="True"/></Style>
+    <Style Selector="Window.compact TextBox"><Setter Property="Height" Value="30"/><Setter Property="MinHeight" Value="30"/></Style>
+    <Style Selector="Window.compact ComboBox"><Setter Property="Height" Value="30"/><Setter Property="MinHeight" Value="30"/></Style>
+    <Style Selector="Window.compact Border.sec"><Setter Property="Height" Value="20"/></Style>
+    <Style Selector="Window.compact Border.seg.wide"><Setter Property="Height" Value="30"/></Style>
+    <Style Selector="Window.compact Border.seg.wide Button"><Setter Property="Height" Value="22"/><Setter Property="MinHeight" Value="22"/></Style>
+    <Style Selector="Window.compact Border.hexbox"><Setter Property="MinHeight" Value="30"/></Style>
+    <Style Selector="Window.compact Button.sm"><Setter Property="Height" Value="28"/><Setter Property="MinHeight" Value="28"/></Style>
+    <Style Selector="Window.compact Border.seg Button"><Setter Property="Height" Value="24"/><Setter Property="MinHeight" Value="24"/></Style>
+    <Style Selector="Window.compact Border.card"><Setter Property="Padding" Value="14,10"/></Style>
+    <Style Selector="Window.compact Border.topbar"><Setter Property="Height" Value="54"/></Style>
+    <Style Selector="Window.compact TextBlock.tilevalue"><Setter Property="FontSize" Value="17"/></Style>
+    <Style Selector="Window.compact TextBlock.tilelabel"><Setter Property="MaxLines" Value="1"/><Setter Property="TextWrapping" Value="NoWrap"/></Style>
+    <Style Selector="Window.compact Border.tile"><Setter Property="Padding" Value="8,7"/></Style>
+    <Style Selector="Window.compact Button.lg"><Setter Property="Height" Value="36"/><Setter Property="MinHeight" Value="36"/></Style>
+    <Style Selector="Window.compact Button.md"><Setter Property="Height" Value="36"/><Setter Property="MinHeight" Value="36"/></Style>
+  </Application.Styles>
+</Application>
