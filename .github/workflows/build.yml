@@ -18,7 +18,6 @@ jobs:
         include:
           - { os: windows-latest, name: Windows x64, target: x86_64-pc-windows-msvc }
           - { os: macos-latest,   name: macOS Apple Silicon, target: aarch64-apple-darwin }
-          - { os: macos-latest,   name: macOS Intel, target: x86_64-apple-darwin }   # Apple Silicon mashinasida kross-kompilyatsiya (macos-13 runner deyarli yo'q)
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -55,7 +54,6 @@ jobs:
         include:
           - { os: windows-latest, name: Windows x64, rid: win-x64 }
           - { os: macos-latest,   name: macOS Apple Silicon, rid: osx-arm64 }
-          - { os: macos-latest,   name: macOS Intel, rid: osx-x64 }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -107,10 +105,8 @@ jobs:
           cp dist/uz-meter-rust-x86_64-pc-windows-msvc/msi/*.msi          release/Uz-Meter-rust-windows-x64.msi
           cp dist/uz-meter-rust-x86_64-pc-windows-msvc/nsis/*.exe         release/Uz-Meter-rust-windows-x64-setup.exe
           cp dist/uz-meter-rust-aarch64-apple-darwin/dmg/*.dmg            release/Uz-Meter-rust-macos-apple-silicon.dmg
-          cp dist/uz-meter-rust-x86_64-apple-darwin/dmg/*.dmg             release/Uz-Meter-rust-macos-intel.dmg
           cp dist/uz-meter-dotnet-win-x64/win-x64/UzMeter.exe             release/Uz-Meter-dotnet-windows-x64.exe
           cp dist/uz-meter-dotnet-osx-arm64/Uz-Meter-osx-arm64.zip        release/Uz-Meter-dotnet-macos-apple-silicon.zip
-          cp dist/uz-meter-dotnet-osx-x64/Uz-Meter-osx-x64.zip            release/Uz-Meter-dotnet-macos-intel.zip
           ls -la release
       - uses: softprops/action-gh-release@v2
         with:

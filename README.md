@@ -47,7 +47,7 @@ cd dotnet-app && dotnet publish -c Release -r win-x64 --self-contained -p:Publis
 ```
 
 **macOS** — `.dmg` / `.app` ni Windows'da yig'ib bo'lmaydi. Buning uchun `.github/workflows/build.yml` tayyor:
-loyihani GitHub'ga yuklang → **Actions** → artefaktlar ichida Windows va macOS (Intel + Apple Silicon) uchun ikkala dasturning tayyor fayllari bo'ladi.
+loyihani GitHub'ga yuklang → **Actions** → artefaktlar ichida Windows va macOS (Apple Silicon) uchun ikkala dasturning tayyor fayllari bo'ladi.
 Imzolanmagan macOS dasturini birinchi marta ochishda: o'ng tugma → *Open* (Gatekeeper).
 
 ## Qurilma tomoni
