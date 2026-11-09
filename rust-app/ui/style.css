@@ -591,3 +591,6 @@ input::placeholder { color: var(--muted); opacity: .5; }
   .frame-tools .btn.sm { padding: 0 8px; }
   .counter.in { font-size: 9.5px; }
 }
+
+.narrow-in { width: 150px; height: 32px; padding: 0 8px; font-family: var(--mono); font-size: 12px; }
+#nextNoBtn { text-transform: none; letter-spacing: 0; }

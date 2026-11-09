@@ -32,9 +32,39 @@ jobs:
       - name: Test protocol
         working-directory: rust-app/src-tauri
         run: cargo test --lib
-      - name: Build bundle
+      - name: Check Apple signing secrets
+        id: apple
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then echo "signed=true" >> "$GITHUB_OUTPUT"; else echo "signed=false" >> "$GITHUB_OUTPUT"; fi
+
+      # macOS: Developer ID bilan imzolash + Apple notarizatsiyasi (secret'lar bo'lsa)
+      - name: Build bundle (macOS, signed + notarized)
+        if: runner.os == 'macOS' && steps.apple.outputs.signed == 'true'
         working-directory: rust-app
-        run: npx --yes @tauri-apps/cli@latest build --target ${{ matrix.target }}
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: npx --yes @tauri-apps/cli@2 build --target ${{ matrix.target }}
+
+      # macOS: secret'lar yo'q — bepul ad-hoc imzo
+      - name: Build bundle (macOS, ad-hoc signed)
+        if: runner.os == 'macOS' && steps.apple.outputs.signed != 'true'
+        working-directory: rust-app
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+        run: npx --yes @tauri-apps/cli@2 build --target ${{ matrix.target }}
+
+      - name: Build bundle (Windows)
+        if: runner.os == 'Windows'
+        working-directory: rust-app
+        run: npx --yes @tauri-apps/cli@2 build --target ${{ matrix.target }}
       - uses: actions/upload-artifact@v4
         with:
           name: uz-meter-rust-${{ matrix.target }}
@@ -44,54 +74,11 @@ jobs:
             rust-app/src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
-  # ---------------- .NET / Avalonia ----------------
-  dotnet:
-    name: .NET · ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { os: windows-latest, name: Windows x64, rid: win-x64 }
-          - { os: macos-latest,   name: macOS Apple Silicon, rid: osx-arm64 }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
-      - name: Self-test protocol
-        working-directory: dotnet-app
-        run: dotnet run -c Release -- --selftest
-      - name: Publish
-        working-directory: dotnet-app
-        run: >
-          dotnet publish -c Release -r ${{ matrix.rid }} --self-contained true
-          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
-          -o out/${{ matrix.rid }}
-      - name: Make macOS .app bundle
-        if: startsWith(matrix.rid, 'osx')
-        working-directory: dotnet-app
-        run: |
-          APP="out/Uz-Meter.app/Contents"
-          mkdir -p "$APP/MacOS" "$APP/Resources"
-          cp out/${{ matrix.rid }}/UzMeter "$APP/MacOS/UzMeter"
-          cp out/${{ matrix.rid }}/*.dylib "$APP/MacOS/" 2>/dev/null || true
-          cp macos/Info.plist "$APP/Info.plist"
-          chmod +x "$APP/MacOS/UzMeter"
-          cd out && zip -r "Uz-Meter-${{ matrix.rid }}.zip" "Uz-Meter.app"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: uz-meter-dotnet-${{ matrix.rid }}
-          path: |
-            dotnet-app/out/${{ matrix.rid }}/UzMeter.exe
-            dotnet-app/out/Uz-Meter-${{ matrix.rid }}.zip
-          if-no-files-found: error
-
   # ---------------- Release (faqat v* teglar) ----------------
   release:
     name: Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [rust, dotnet]
+    needs: [rust]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -102,11 +89,9 @@ jobs:
       - name: Rename files by platform
         run: |
           mkdir -p release
-          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/msi/*.msi          release/Uz-Meter-rust-windows-x64.msi
-          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/nsis/*.exe         release/Uz-Meter-rust-windows-x64-setup.exe
-          cp dist/uz-meter-rust-aarch64-apple-darwin/dmg/*.dmg            release/Uz-Meter-rust-macos-apple-silicon.dmg
-          cp dist/uz-meter-dotnet-win-x64/win-x64/UzMeter.exe             release/Uz-Meter-dotnet-windows-x64.exe
-          cp dist/uz-meter-dotnet-osx-arm64/Uz-Meter-osx-arm64.zip        release/Uz-Meter-dotnet-macos-apple-silicon.zip
+          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/msi/*.msi          release/Uz-Meter-windows-x64.msi
+          cp dist/uz-meter-rust-x86_64-pc-windows-msvc/nsis/*.exe         release/Uz-Meter-windows-x64-setup.exe
+          cp dist/uz-meter-rust-aarch64-apple-darwin/dmg/*.dmg            release/Uz-Meter-macos-apple-silicon.dmg
           ls -la release
       - uses: softprops/action-gh-release@v2
         with:

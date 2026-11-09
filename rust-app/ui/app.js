@@ -6,13 +6,16 @@
 
   const $ = (id) => document.getElementById(id);
   const SENDS = [1, 2, 3, 4, 6, 8, 12, 24];
+  const PULSE_TYPE = 4; // "Tur 5 — Impulsli"
   const UNITS = ["1 L", "10 L", "100 L", "1000 L"];
   const VIEWS = ["home", "config", "device", "log", "settings", "help"];
   const SPLASH_MS = 3000;
   const PORT_POLL_MS = 3000;
 
   /* ===================== SOZLAMALAR (localStorage) ===================== */
-  const DEFAULTS = { lang: "uz", theme: "light", sound: true, autofill: true, timeout: 2500, autoconnect: false, lastPort: "", lastBaud: "9600", autoScroll: true };
+  const DEFAULTS = { lang: "uz", theme: "light", sound: true, autofill: true, timeout: 2500, autoconnect: false, lastPort: "", lastBaud: "9600", autoScroll: true,
+    autoDev: false, devMin: "", devMax: "", devNext: "",
+    autoM: false, mMin: "", mMax: "", mNext: "" };
   const loadSettings = () => {
     try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem("settings") || "{}") }; } catch (_) { return { ...DEFAULTS }; }
   };
@@ -148,6 +151,8 @@
 
     if ($("portSel").options.length && !$("portSel").value) $("portSel").options[0].textContent = t("no_ports");
     renderProtocol();
+    updateInitField();
+    renderAutoSub();
     renderDevice();
     renderConn();
     renderStatus();
@@ -387,6 +392,103 @@
     }
   }
 
+  /* ===================== AVTO RAQAM (oraliq bo'yicha, localStorage'da eslab qolinadi) ===================== */
+  const AUTO = {
+    Dev: { len: 15, field: "deviceNo", on: "autoDev", min: "devMin", max: "devMax", next: "devNext" },
+    M: { len: 14, field: "mNo", on: "autoM", min: "mMin", max: "mMax", next: "mNext" },
+  };
+  const AUTO_KEYS = Object.values(AUTO).flatMap((a) => [a.on, a.min, a.max, a.next]);
+  const big = (v) => BigInt(v);
+  const padNo = (n, len) => n.toString().padStart(len, "0");
+  /** null = oraliq kiritilmagan/noto'g'ri */
+  function autoRange(a) {
+    const mn = settings[a.min], mx = settings[a.max];
+    if (mn.length !== a.len || mx.length !== a.len || big(mn) > big(mx)) return null;
+    return [big(mn), big(mx)];
+  }
+  /** Keyingi beriladigan raqam: "ok" | "exhausted" | "bad" */
+  function autoPeek(a) {
+    const r = autoRange(a);
+    if (!r) return { st: "bad" };
+    const nx = settings[a.next];
+    let n = nx.length === a.len ? big(nx) : r[0];
+    if (n < r[0]) n = r[0];
+    if (n > r[1]) return { st: "exhausted" };
+    return { st: "ok", value: padNo(n, a.len), n };
+  }
+  function renderAutoSub() {
+    for (const [k, a] of Object.entries(AUTO)) {
+      const el = $(`auto${k}Sub`);
+      const p = autoPeek(a);
+      const has = settings[a.min] || settings[a.max];
+      el.textContent = p.st === "ok" ? `→ ${p.value}` : p.st === "exhausted" ? t("range_end") : has ? t("err_range") : "";
+      el.style.color = p.st === "ok" || !has ? "" : "var(--danger)";
+    }
+  }
+  /** Yoqilgan avto raqamlarni maydonlarga yozadi */
+  function autoFillForm(quiet = false) {
+    let changed = false;
+    for (const a of Object.values(AUTO)) {
+      if (!settings[a.on]) continue;
+      const p = autoPeek(a);
+      if (p.st === "ok") { $(a.field).value = p.value; changed = true; }
+      else if (!quiet) toast(t(p.st === "exhausted" ? "range_end" : "err_range"), "err");
+    }
+    renderAutoSub();
+    if (changed) onFormChange();
+  }
+  /** Raqamni 1 ga oshiradi (eslab qolinadi) */
+  function autoAdvance(a) {
+    const p = autoPeek(a);
+    if (p.st !== "ok") return;
+    settings[a.next] = padNo(p.n + 1n, a.len);
+    saveSettings();
+    $(`auto${a === AUTO.Dev ? "Dev" : "M"}Next`).value = settings[a.next];
+  }
+  /** Yozish muvaffaqiyatli bo'lgach: formadagi raqam avto raqam bo'lsa — keyingisiga o'tamiz */
+  function autoAfterWrite() {
+    let any = false;
+    for (const a of Object.values(AUTO)) {
+      if (!settings[a.on]) continue;
+      const p = autoPeek(a);
+      if (p.st === "ok" && $(a.field).value === p.value) { autoAdvance(a); any = true; }
+    }
+    if (any) autoFillForm(true);
+  }
+  function nextNumber() {
+    const on = Object.values(AUTO).filter((a) => settings[a.on]);
+    if (!on.length) { toast(t("s_autoDev"), "err"); setView("settings"); return; }
+    on.forEach(autoAdvance);
+    autoFillForm();
+  }
+  function initAutoUI() {
+    for (const [k, a] of Object.entries(AUTO)) {
+      $(`auto${k}Chk`).checked = settings[a.on];
+      for (const key of ["min", "max", "next"]) {
+        const el = $(`auto${k}${key[0].toUpperCase()}${key.slice(1)}`);
+        el.maxLength = a.len;
+        el.value = settings[a[key]];
+        el.addEventListener("input", () => {
+          el.value = el.value.replace(/\D/g, "").slice(0, a.len);
+          settings[a[key]] = el.value;
+          if (key !== "next" && autoRange(a) && (settings[a.next].length !== a.len || big(settings[a.next]) < autoRange(a)[0])) {
+            settings[a.next] = settings[a.min];
+            $(`auto${k}Next`).value = settings[a.next];
+          }
+          saveSettings();
+          renderAutoSub();
+        });
+        el.addEventListener("change", () => autoFillForm(true));
+      }
+      $(`auto${k}Chk`).addEventListener("change", (e) => {
+        settings[a.on] = e.target.checked;
+        saveSettings();
+        if (settings[a.on]) autoFillForm();
+      });
+    }
+    renderAutoSub();
+  }
+
   /* ===================== FORMA ===================== */
   function getConfig() {
     return {
@@ -397,7 +499,19 @@
       unit: state.unit,
       sends_per_day: Number($("sendsSel").value),
       meter_type: Number($("typeSel").value),
+      initial_value: initialValue(),
     };
+  }
+  /** Boshlang'ich qiymat (litr): faqat impulsli tur (4) va maydon to'ldirilgan bo'lsa */
+  function initialValue() {
+    if (Number($("typeSel").value) !== PULSE_TYPE) return null;
+    const v = $("initialValue").value;
+    return v === "" ? null : Math.min(4294967295, Number(v));
+  }
+  function updateInitField() {
+    const pulse = Number($("typeSel").value) === PULSE_TYPE;
+    $("initialValue").disabled = !pulse;
+    $("initHint").textContent = t(pulse ? "hint_initial" : "hint_initial_off");
   }
   function addSendsOption(n) {
     const sel = $("sendsSel");
@@ -417,6 +531,7 @@
     if (!SENDS.includes(sends) && sends >= 1 && sends <= 24) addSendsOption(sends);
     $("sendsSel").value = String(sends);
     $("typeSel").value = String(Math.min(5, Math.max(0, c.meter_type | 0)));
+    if (c.initial_value !== undefined) $("initialValue").value = c.initial_value == null ? "" : String(c.initial_value);
     syncSegs();
     onFormChange();
   }
@@ -438,6 +553,7 @@
   let previewTimer;
   function onFormChange() {
     updateCounters();
+    updateInitField();
     clearTimeout(previewTimer);
     previewTimer = setTimeout(recalc, 100);
   }
@@ -457,7 +573,8 @@
     }
     if (state.frameTab === "struct") renderStruct();
   }
-  const resetForm = () => setConfig({ device_no: "", m_no: "", server_url: "", valve_open: true, unit: 0, sends_per_day: 6, meter_type: 0 });
+  const resetForm = () => setConfig({ device_no: "", m_no: "", server_url: "", valve_open: true, unit: 0, sends_per_day: 6, meter_type: 0, initial_value: null });
+  const resetFormAuto = () => { resetForm(); autoFillForm(true); };
 
   /** HEX kadrni maydonlarga ajratib jadval ko'rinishida chizadi (PROTOCOL.md → CONFIG). */
   function renderStruct() {
@@ -466,6 +583,7 @@
     const b = state.lastHex.split(" ");
     const ascii = (arr) => arr.map((h) => String.fromCharCode(parseInt(h, 16))).join("");
     const urlLen = parseInt(b[37], 16);
+    const extra = b.length - (38 + urlLen) - 2; // CRC dan oldingi qo'shimcha baytlar (boshlang'ich qiymat)
     const rows = [
       [t("st_sof"), 0, 2, b.slice(0, 2), "AA 55"],
       [t("st_cmd"), 2, 1, b.slice(2, 3), "SET_CONFIG"],
@@ -478,7 +596,8 @@
       [t("meter_type"), 36, 1, b.slice(36, 37), t("meter_types")[parseInt(b[36], 16)] ?? b[36]],
       [t("st_url_len"), 37, 1, b.slice(37, 38), String(urlLen)],
       [t("server_url"), 38, urlLen, b.slice(38, 38 + urlLen), ascii(b.slice(38, 38 + urlLen))],
-      [t("st_crc"), 38 + urlLen, 2, b.slice(-2), `0x${b[b.length - 1]}${b[b.length - 2]}`],
+      ...(extra === 4 ? [[t("initial_value"), 38 + urlLen, 4, b.slice(38 + urlLen, 42 + urlLen), String(parseInt(b.slice(38 + urlLen, 42 + urlLen).reverse().join(""), 16))]] : []),
+      [t("st_crc"), 38 + urlLen + (extra === 4 ? 4 : 0), 2, b.slice(-2), `0x${b[b.length - 1]}${b[b.length - 2]}`],
     ];
     box.innerHTML = `<table><thead><tr><th>${t("st_field")}</th><th>${t("st_off")}</th><th>${t("st_len")}</th><th>${t("st_bytes")}</th><th>${t("st_value")}</th></tr></thead><tbody>` +
       rows.map(([n, o, l, bytes, v]) => `<tr><td>${escapeHtml(n)}</td><td class="n">${o}</td><td class="n">${l}</td><td class="b" title="${escapeHtml(bytes.join(" "))}">${escapeHtml(bytes.join(" "))}</td><td>${escapeHtml(v)}</td></tr>`).join("") +
@@ -505,7 +624,7 @@
       const r = await invoke("write_config", { cfg: getConfig(), timeout: settings.timeout });
       log("tx", `${t("log_cmd_sent", { cmd: "0x01" })}: ${r.tx_hex}`);
       if (r.rx_hex) log("rx", r.rx_hex);
-      if (r.ack === 0) { log("info", t("ack_ok")); log("info", t("ok_written")); toast(t("ok_written"), "ok"); setStatus(t("ok_written"), "ok"); playOk(); }
+      if (r.ack === 0) { log("info", t("ack_ok")); log("info", t("ok_written")); toast(t("ok_written"), "ok"); setStatus(t("ok_written"), "ok"); playOk(); autoAfterWrite(); }
       else if (r.ack === 1) { log("error", t("ack_crc")); toast(t("ack_crc"), "err"); setStatus(t("ack_crc"), "err"); playErr(); }
       else if (r.ack === 2) { log("error", t("ack_invalid")); toast(t("ack_invalid"), "err"); setStatus(t("ack_invalid"), "err"); playErr(); }
       else { log("warn", t("no_ack")); toast(t("no_ack")); setStatus(t("no_ack"), "warn"); }
@@ -557,7 +676,7 @@
     }
   }
 
-  const fmtM3 = (l) => (l / 1000).toLocaleString(settings.lang === "en" ? "en-US" : "ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fmtM3 = (l) => (l / 1000).toLocaleString(settings.lang === "en" ? "en-US" : "ru-RU", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
   function renderDevice(fresh = false) {
     const d = state.loaded;
@@ -617,14 +736,14 @@
     $("protocolBody").innerHTML =
       `<b>Frame</b>: <code>AA 55</code> <code>CMD</code> <code>LEN</code> <code>PAYLOAD…</code> <code>CRC16 lo hi</code> (CRC-16/MODBUS over CMD+LEN+PAYLOAD)
 <table><tr><th>CMD</th><th>Dir</th><th>Payload</th></tr>${rows([["0x01", "PC → device", "CONFIG"], ["0x02", "PC → device", "—"], ["0x81", "device → PC", "status: 0=OK 1=CRC 2=invalid"], ["0x82", "device → PC", "CONFIG + TELEMETRY"]])}</table><b>CONFIG</b>
-<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "15", "device_no (ASCII digits)"], ["15", "14", "m_no (ASCII digits)"], ["29", "1", "valve: 0=closed 1=open"], ["30", "1", "unit: 0=1L 1=10L 2=100L 3=1000L"], ["31", "1", "sends_per_day: 1..24"], ["32", "1", "meter_type: 0..5"], ["33", "1", "url_len N (≤128)"], ["34", "N", "server_url (ASCII)"]])}</table><b>TELEMETRY</b> (after CONFIG in 0x82)
+<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "15", "device_no (ASCII digits)"], ["15", "14", "m_no (ASCII digits)"], ["29", "1", "valve: 0=closed 1=open"], ["30", "1", "unit: 0=1L 1=10L 2=100L 3=1000L"], ["31", "1", "sends_per_day: 1..24"], ["32", "1", "meter_type: 0..5"], ["33", "1", "url_len N (≤128)"], ["34", "N", "server_url (ASCII)"], ["34+N", "4", "initial_value u32 LE, liters (optional, only 0x01 and meter_type=4 pulse)"]])}</table><b>TELEMETRY</b> (after CONFIG in 0x82)
 <table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "4", "water_volume, u32 LE, liters"], ["4", "2", "battery_mv, u16 LE"], ["6", "1", "battery_pct 0..100"]])}</table>`;
   }
 
   /* ===================== MENYU (Rust dan) ===================== */
   listen("menu", (ev) => {
     const map = {
-      open: loadFromFile, save: saveToFile, reset: resetForm,
+      open: loadFromFile, save: saveToFile, reset: resetFormAuto,
       copy_hex: copyHex,
       clear_log: clearLog,
       lang_uz: () => setLang("uz"), lang_ru: () => setLang("ru"), lang_en: () => setLang("en"),
@@ -652,6 +771,8 @@
   $("serverUrl").addEventListener("input", onFormChange);
   $("sendsSel").addEventListener("change", onFormChange);
   $("typeSel").addEventListener("change", onFormChange);
+  $("initialValue").addEventListener("input", (e) => { digitsOnly(e.target, 10); onFormChange(); });
+  $("nextNoBtn").addEventListener("click", nextNumber);
   $("valveSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-val]"); if (!b) return; state.valve = Number(b.dataset.val); syncSegs(); onFormChange(); });
   $("unitSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-val]"); if (!b) return; state.unit = Number(b.dataset.val); syncSegs(); onFormChange(); });
   $("frameTabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (b) setFrameTab(b.dataset.tab); });
@@ -679,7 +800,9 @@
   $("autoconnectChk").addEventListener("change", (e) => { settings.autoconnect = e.target.checked; saveSettings(); });
   $("timeoutSel").addEventListener("change", (e) => { settings.timeout = Number(e.target.value); saveSettings(); });
   $("resetSettingsBtn").addEventListener("click", () => {
-    Object.assign(settings, DEFAULTS); saveSettings();
+    // Avto raqam oraliqlari va oxirgi raqamlar o'chirilmaydi (ular qurilmalar tartibini saqlaydi)
+    const keep = Object.fromEntries(AUTO_KEYS.map((k) => [k, settings[k]]));
+    Object.assign(settings, DEFAULTS, keep); saveSettings();
     applyTheme(); applySettingsUI(); applyLang(); toast(t("settings_reset_done"), "ok");
   });
 
@@ -698,10 +821,12 @@
   /* ===================== ISHGA TUSHIRISH ===================== */
   applyTheme();
   applySettingsUI();
+  initAutoUI();
   applyLang();
   syncSegs();
   $("sendsSel").value = "6";
   $("baudSel").value = settings.lastBaud;
+  autoFillForm(true);
   onFormChange();
   setStatus(null);
   refreshPorts(true);

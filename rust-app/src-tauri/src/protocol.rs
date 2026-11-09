@@ -15,6 +15,8 @@ pub const M_NO_LEN: usize = 14;
 pub const URL_MAX: usize = 128;
 pub const CONFIG_FIXED_LEN: usize = 34;
 pub const TELEMETRY_LEN: usize = 7;
+/// Impulsli hisoblagich turi (meter_type)
+pub const METER_PULSE: u8 = 4;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -28,6 +30,10 @@ pub struct Config {
     pub sends_per_day: u8,
     /// 0..5
     pub meter_type: u8,
+    /// Boshlang'ich hajm (litr). Faqat impulsli hisoblagich (meter_type = 4) uchun
+    /// va faqat 0x01 kadrida yuboriladi (CONFIG oxiriga u32 LE). None — hisoblagich o'zgarmaydi.
+    #[serde(default)]
+    pub initial_value: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -95,6 +101,11 @@ pub fn encode_config(cfg: &Config) -> Vec<u8> {
     p.push(cfg.meter_type);
     p.push(cfg.server_url.len() as u8);
     p.extend_from_slice(cfg.server_url.as_bytes());
+    if cfg.meter_type == METER_PULSE {
+        if let Some(v) = cfg.initial_value {
+            p.extend_from_slice(&v.to_le_bytes());
+        }
+    }
     p
 }
 
@@ -159,6 +170,7 @@ pub fn decode_config(p: &[u8]) -> Result<(Config, usize), String> {
         sends_per_day: p[31],
         meter_type: p[32],
         server_url: String::from_utf8_lossy(&p[34..34 + url_len]).into_owned(),
+        initial_value: None,
     };
     Ok((cfg, CONFIG_FIXED_LEN + url_len))
 }
@@ -207,6 +219,26 @@ mod tests {
     }
 
     #[test]
+    fn initial_value_pulse_only() {
+        let mut cfg = Config {
+            device_no: "123456789012345".into(),
+            m_no: "98765432109876".into(),
+            server_url: "http://a.uz/".into(),
+            valve_open: true,
+            unit: 0,
+            sends_per_day: 6,
+            meter_type: METER_PULSE,
+            initial_value: Some(100),
+        };
+        let base = encode_config(&Config { initial_value: None, ..cfg.clone() });
+        let with = encode_config(&cfg);
+        assert_eq!(with.len(), base.len() + 4);
+        assert_eq!(&with[base.len()..], &[100, 0, 0, 0]);
+        cfg.meter_type = 2;
+        assert_eq!(encode_config(&cfg).len(), base.len());
+    }
+
+    #[test]
     fn roundtrip() {
         let cfg = Config {
             device_no: "123456789012345".into(),
@@ -216,6 +248,7 @@ mod tests {
             unit: 2,
             sends_per_day: 6,
             meter_type: 3,
+            initial_value: Some(100), // meter_type != 4 — kadrga qo'shilmaydi
         };
         validate(&cfg).unwrap();
         // .NET versiyasi (UzMeter --selftest) bilan bir xil kadr

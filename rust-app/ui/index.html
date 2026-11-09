@@ -142,7 +142,9 @@
         </div>
 
         <div class="form">
-          <div class="sec"><i>1</i><span data-i18n="sec_ident"></span></div>
+          <div class="sec"><i>1</i><span data-i18n="sec_ident"></span>
+            <button class="btn sm" id="nextNoBtn" type="button" style="margin-left:auto" data-i18n-title="next_no_title"><svg><use href="#i-refresh"/></svg><span data-i18n="next_no"></span></button>
+          </div>
           <div class="two">
             <div class="field">
               <label for="deviceNo"><span data-i18n="device_no"></span><em>*</em></label>
@@ -209,6 +211,14 @@
               <label for="typeSel"><span data-i18n="meter_type"></span></label>
               <select id="typeSel"></select>
             </div>
+          </div>
+
+          <div class="field" id="initField">
+            <label for="initialValue"><span data-i18n="initial_value"></span></label>
+            <div class="input-wrap">
+              <input id="initialValue" inputmode="numeric" maxlength="10" placeholder="0" autocomplete="off" />
+            </div>
+            <div class="field-foot"><span class="hint" id="initHint"></span></div>
           </div>
 
           <div class="field frame">
@@ -339,6 +349,30 @@
           <div class="srow">
             <div><div class="s-title" data-i18n="s_autoconnect"></div><div class="s-sub" data-i18n="s_autoconnect_sub"></div></div>
             <label class="switch"><input type="checkbox" id="autoconnectChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_autoDev"></div><div class="s-sub" data-i18n="s_autoDev_sub"></div></div>
+            <label class="switch"><input type="checkbox" id="autoDevChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_range"></div><div class="s-sub" id="autoDevSub"></div></div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+              <input id="autoDevMin" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_from" />
+              <input id="autoDevMax" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_to" />
+              <input id="autoDevNext" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_next" data-i18n-title="s_next" />
+            </div>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_autoM"></div><div class="s-sub" data-i18n="s_autoM_sub"></div></div>
+            <label class="switch"><input type="checkbox" id="autoMChk" /><i></i></label>
+          </div>
+          <div class="srow">
+            <div><div class="s-title" data-i18n="s_range"></div><div class="s-sub" id="autoMSub"></div></div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+              <input id="autoMMin" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_from" />
+              <input id="autoMMax" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_to" />
+              <input id="autoMNext" class="narrow-in" inputmode="numeric" data-i18n-placeholder="s_next" data-i18n-title="s_next" />
+            </div>
           </div>
           <div class="srow">
             <div><div class="s-title" data-i18n="s_reset"></div><div class="s-sub" data-i18n="s_reset_sub"></div></div>

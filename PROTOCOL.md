@@ -37,6 +37,7 @@ CRC `CMD`, `LEN` va `PAYLOAD` baytlari ustidan hisoblanadi (start baytlar kirmay
 | 32    | 1    | `meter_type`    | 0..5 (6 xil hisoblagich turi) |
 | 33    | 1    | `url_len`       | N, 0..128 |
 | 34    | N    | `server_url`    | ASCII |
+| 34+N  | 4    | `initial_value` | *Ixtiyoriy*, u32 LE, litr. Faqat `0x01` kadrida va faqat `meter_type = 4` (impulsli) bo'lganda yuboriladi; qurilma hisobni shu qiymatdan boshlaydi. Boshqa turlarda e'tiborga olinmaydi |
 
 ## TELEMETRY (7 bayt) — faqat `0x82` javobida, CONFIG dan keyin
 
