@@ -139,6 +139,13 @@ pub fn run() {
             }
             Ok(())
         })
+        .on_window_event(|window, event| {
+            // Oyna yopilsa port bo'shatilib, jarayon to'liq tugaydi (orqada qolib ketmasin)
+            if let tauri::WindowEvent::CloseRequested { .. } = event {
+                window.state::<Link>().disconnect();
+                window.app_handle().exit(0);
+            }
+        })
         .on_menu_event(|app, event| {
             let id = event.id().0.clone();
             if id == "quit" {

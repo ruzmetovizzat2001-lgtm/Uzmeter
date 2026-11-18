@@ -15,8 +15,14 @@ pub const M_NO_LEN: usize = 14;
 pub const URL_MAX: usize = 128;
 pub const CONFIG_FIXED_LEN: usize = 34;
 pub const TELEMETRY_LEN: usize = 7;
+/// TELEMETRY + teskari oqim (u32). Eski proshivka 7 bayt yuboradi — u holda teskari oqim noma'lum.
+pub const TELEMETRY_REV_LEN: usize = 11;
 /// Impulsli hisoblagich turi (meter_type)
 pub const METER_PULSE: u8 = 4;
+/// Ultratovushli hisoblagich turi (meter_type). Qurilma raqami klapan (CJ/T188) manzili sifatida
+/// ishlatiladi, shuning uchun aynan 14 ta raqam bo'lishi shart.
+pub const METER_ULTRASONIC: u8 = 2;
+pub const DEVICE_NO_ULTRA_LEN: usize = 14;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -39,6 +45,9 @@ pub struct Config {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Telemetry {
     pub water_volume_l: u32,
+    /// Teskari oqim (litr). None — qurilma bu maydonni yubormaydi (eski proshivka).
+    #[serde(default)]
+    pub reverse_volume_l: Option<u32>,
     pub battery_mv: u16,
     pub battery_pct: u8,
 }
@@ -69,14 +78,24 @@ fn all_digits(s: &str, n: usize) -> bool {
     s.len() == n && s.bytes().all(|b| b.is_ascii_digit())
 }
 
+/// Proshivka (safeText) bilan bir xil: faqat ko'rinadigan ASCII, bo'shliq, `"` va teskari slesh yo'q.
+fn url_chars_ok(s: &str) -> bool {
+    s.bytes().all(|c| c > 0x20 && c <= 0x7E && c != b'"' && c != b'\\')
+}
+
 pub fn validate(cfg: &Config) -> Result<(), String> {
-    if !all_digits(&cfg.device_no, DEVICE_NO_LEN) {
+    // Qurilma raqami: 1..15 ta raqam; ultratovushlida aynan 14 ta (klapan manzili)
+    let dev = &cfg.device_no;
+    if dev.is_empty() || dev.len() > DEVICE_NO_LEN || !dev.bytes().all(|b| b.is_ascii_digit()) {
         return Err("err_device_no".into());
+    }
+    if cfg.meter_type == METER_ULTRASONIC && dev.len() != DEVICE_NO_ULTRA_LEN {
+        return Err("err_device_no_ultra".into());
     }
     if !all_digits(&cfg.m_no, M_NO_LEN) {
         return Err("err_m_no".into());
     }
-    if cfg.server_url.is_empty() || cfg.server_url.len() > URL_MAX || !cfg.server_url.is_ascii() {
+    if cfg.server_url.is_empty() || cfg.server_url.len() > URL_MAX || !url_chars_ok(&cfg.server_url) {
         return Err("err_url".into());
     }
     if cfg.unit > 3 {
@@ -93,7 +112,12 @@ pub fn validate(cfg: &Config) -> Result<(), String> {
 
 pub fn encode_config(cfg: &Config) -> Vec<u8> {
     let mut p = Vec::with_capacity(CONFIG_FIXED_LEN + cfg.server_url.len());
-    p.extend_from_slice(cfg.device_no.as_bytes());
+    // device_no maydoni doim 15 bayt: qisqa raqam oxiri 0x00 bilan to'ldiriladi
+    let mut dev = [0u8; DEVICE_NO_LEN];
+    let d = cfg.device_no.as_bytes();
+    let n = d.len().min(DEVICE_NO_LEN);
+    dev[..n].copy_from_slice(&d[..n]);
+    p.extend_from_slice(&dev);
     p.extend_from_slice(cfg.m_no.as_bytes());
     p.push(cfg.valve_open as u8);
     p.push(cfg.unit);
@@ -154,6 +178,12 @@ pub fn parse_frame(buf: &[u8]) -> Result<Option<(u8, Vec<u8>, usize)>, String> {
     Ok(None)
 }
 
+/// Qattiq uzunlikdagi ASCII maydon: birinchi 0x00 gacha (qisqa raqam 0x00 bilan to'ldirilgan bo'ladi)
+fn field_str(b: &[u8]) -> String {
+    let end = b.iter().position(|&c| c == 0).unwrap_or(b.len());
+    String::from_utf8_lossy(&b[..end]).into_owned()
+}
+
 pub fn decode_config(p: &[u8]) -> Result<(Config, usize), String> {
     if p.len() < CONFIG_FIXED_LEN {
         return Err("err_short".into());
@@ -163,8 +193,8 @@ pub fn decode_config(p: &[u8]) -> Result<(Config, usize), String> {
         return Err("err_short".into());
     }
     let cfg = Config {
-        device_no: String::from_utf8_lossy(&p[0..15]).into_owned(),
-        m_no: String::from_utf8_lossy(&p[15..29]).into_owned(),
+        device_no: field_str(&p[0..15]),
+        m_no: field_str(&p[15..29]),
         valve_open: p[29] != 0,
         unit: p[30],
         sends_per_day: p[31],
@@ -185,6 +215,7 @@ pub fn decode_device_data(p: &[u8]) -> Result<DeviceData, String> {
         water_volume_l: u32::from_le_bytes([t[0], t[1], t[2], t[3]]),
         battery_mv: u16::from_le_bytes([t[4], t[5]]),
         battery_pct: t[6].min(100),
+        reverse_volume_l: (t.len() >= TELEMETRY_REV_LEN).then(|| u32::from_le_bytes([t[7], t[8], t[9], t[10]])),
     };
     Ok(DeviceData { config, telemetry })
 }
@@ -239,6 +270,14 @@ mod tests {
     }
 
     #[test]
+    fn url_chars_like_firmware() {
+        assert!(url_chars_ok("https://a.uz/api?x=1"));
+        assert!(!url_chars_ok("a b"));
+        assert!(!url_chars_ok("a\"b"));
+        assert!(!url_chars_ok("a\\b"));
+    }
+
+    #[test]
     fn roundtrip() {
         let cfg = Config {
             device_no: "123456789012345".into(),
@@ -268,5 +307,57 @@ mod tests {
         assert_eq!(d.telemetry.water_volume_l, 10000);
         assert_eq!(d.telemetry.battery_mv, 3760);
         assert_eq!(d.telemetry.battery_pct, 87);
+        assert_eq!(d.telemetry.reverse_volume_l, None); // eski proshivka — 7 bayt
+    }
+
+    fn base_cfg() -> Config {
+        Config {
+            device_no: "123456789012345".into(),
+            m_no: "98765432109876".into(),
+            server_url: "http://a.uz/".into(),
+            valve_open: true,
+            unit: 0,
+            sends_per_day: 6,
+            meter_type: 0,
+            initial_value: None,
+        }
+    }
+
+    #[test]
+    fn device_no_any_length_padded() {
+        let cfg = Config { device_no: "42".into(), ..base_cfg() };
+        validate(&cfg).unwrap();
+        let p = encode_config(&cfg);
+        assert_eq!(&p[0..15], &[b'4', b'2', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(&p[15..29], b"98765432109876"); // m_no siljimaydi
+        let (back, _) = decode_config(&p).unwrap();
+        assert_eq!(back.device_no, "42");
+        assert_eq!(back.m_no, cfg.m_no);
+        for bad in ["", "1234567890123456", "12a"] {
+            assert_eq!(validate(&Config { device_no: bad.into(), ..base_cfg() }).unwrap_err(), "err_device_no");
+        }
+    }
+
+    #[test]
+    fn ultrasonic_needs_14_digit_device_no() {
+        let mut cfg = Config { meter_type: METER_ULTRASONIC, ..base_cfg() };
+        assert_eq!(validate(&cfg).unwrap_err(), "err_device_no_ultra"); // 15 ta
+        cfg.device_no = "17022604000046".into();
+        validate(&cfg).unwrap();
+        cfg.device_no = "123".into();
+        assert_eq!(validate(&cfg).unwrap_err(), "err_device_no_ultra");
+        // M_NO avvalgidek aynan 14 ta
+        cfg.device_no = "17022604000046".into();
+        cfg.m_no = "123".into();
+        assert_eq!(validate(&cfg).unwrap_err(), "err_m_no");
+    }
+
+    #[test]
+    fn telemetry_with_reverse() {
+        let mut payload = encode_config(&base_cfg());
+        payload.extend_from_slice(&[0x10, 0x27, 0, 0, 0xB0, 0x0E, 87, 0x39, 0x30, 0, 0]);
+        let d = decode_device_data(&payload).unwrap();
+        assert_eq!(d.telemetry.water_volume_l, 10000);
+        assert_eq!(d.telemetry.reverse_volume_l, Some(12345));
     }
 }

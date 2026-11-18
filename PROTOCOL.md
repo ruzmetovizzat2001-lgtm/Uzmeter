@@ -29,8 +29,8 @@ CRC `CMD`, `LEN` va `PAYLOAD` baytlari ustidan hisoblanadi (start baytlar kirmay
 
 | Ofset | Hajm | Maydon | Qiymat |
 |-------|------|--------|--------|
-| 0     | 15   | `device_no`     | ASCII, 15 ta raqam |
-| 15    | 14   | `m_no`          | ASCII, 14 ta raqam |
+| 0     | 15   | `device_no`     | ASCII, 1..15 ta raqam; qisqasi oxiri `0x00` bilan to'ldiriladi. `meter_type = 2` (ultratovushli) bo'lsa aynan 14 ta raqam — hisoblagich/klapan (CJ/T188) manzili shundan olinadi |
+| 15    | 14   | `m_no`          | ASCII, 14 ta raqam (serverga JSON `M_NO.` sifatida ketadi) |
 | 29    | 1    | `valve`         | 0 = yopiq, 1 = ochiq |
 | 30    | 1    | `unit`          | 0 = 1 L, 1 = 10 L, 2 = 100 L, 3 = 1000 L |
 | 31    | 1    | `sends_per_day` | 1..24 (kuniga necha marta yuboradi) |
@@ -39,13 +39,14 @@ CRC `CMD`, `LEN` va `PAYLOAD` baytlari ustidan hisoblanadi (start baytlar kirmay
 | 34    | N    | `server_url`    | ASCII |
 | 34+N  | 4    | `initial_value` | *Ixtiyoriy*, u32 LE, litr. Faqat `0x01` kadrida va faqat `meter_type = 4` (impulsli) bo'lganda yuboriladi; qurilma hisobni shu qiymatdan boshlaydi. Boshqa turlarda e'tiborga olinmaydi |
 
-## TELEMETRY (7 bayt) — faqat `0x82` javobida, CONFIG dan keyin
+## TELEMETRY (7 yoki 11 bayt) — faqat `0x82` javobida, CONFIG dan keyin
 
 | Ofset | Hajm | Maydon | Qiymat |
 |-------|------|--------|--------|
 | 0     | 4    | `water_volume`  | u32 LE, litr |
 | 4     | 2    | `battery_mv`    | u16 LE, millivolt |
 | 6     | 1    | `battery_pct`   | 0..100 % |
+| 7     | 4    | `reverse_volume` | *Ixtiyoriy*, u32 LE, litr — teskari oqim. Eski proshivka yubormaydi (7 bayt), dastur u holda "—" ko'rsatadi |
 
 ## Misol: sozlama yozish
 

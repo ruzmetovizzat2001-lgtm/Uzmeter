@@ -111,17 +111,30 @@ fn transact_on(port: &mut dyn serialport::SerialPort, frame: &[u8], timeout_ms: 
     let deadline = Instant::now() + Duration::from_millis(timeout_ms);
     let mut buf: Vec<u8> = Vec::new();
     let mut chunk = [0u8; 256];
+    let mut crc_err = false;
 
     while Instant::now() < deadline {
         match port.read(&mut chunk) {
             Ok(n) if n > 0 => {
                 buf.extend_from_slice(&chunk[..n]);
-                match protocol::parse_frame(&buf) {
-                    Ok(Some((cmd, payload, _))) => {
-                        return Ok(Exchange { tx_hex: hex(frame), rx_hex: hex(&buf), cmd: Some(cmd), payload });
+                // IR ko'prigi o'z uzatishimizni aks-sado qilib qaytarishi mumkin (0x01/0x02 kadr) —
+                // uni o'tkazib yuborib, haqiqiy javob (0x81/0x82) ni kutamiz.
+                loop {
+                    match protocol::parse_frame(&buf) {
+                        Ok(Some((cmd, payload, used))) => {
+                            if cmd & 0x80 != 0 {
+                                return Ok(Exchange { tx_hex: hex(frame), rx_hex: hex(&buf), cmd: Some(cmd), payload });
+                            }
+                            buf.drain(..used.min(buf.len()));
+                            crc_err = false;
+                        }
+                        Ok(None) => break,
+                        Err(_) => {
+                            // Buzilgan kadr: darhol to'xtamaymiz — javobning qolgan qismi kelishi mumkin.
+                            crc_err = true;
+                            break;
+                        }
                     }
-                    Ok(None) => {}
-                    Err(e) => return Err(format!("{}|{}", e, hex(&buf))),
                 }
             }
             Ok(_) => {}
@@ -130,5 +143,8 @@ fn transact_on(port: &mut dyn serialport::SerialPort, frame: &[u8], timeout_ms: 
         }
     }
 
+    if crc_err {
+        return Err(format!("err_crc|{}", hex(&buf)));
+    }
     Ok(Exchange { tx_hex: hex(frame), rx_hex: hex(&buf), cmd: None, payload: Vec::new() })
 }

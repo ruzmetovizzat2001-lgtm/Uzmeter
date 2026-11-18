@@ -7,13 +7,17 @@
   const $ = (id) => document.getElementById(id);
   const SENDS = [1, 2, 3, 4, 6, 8, 12, 24];
   const PULSE_TYPE = 4; // "Tur 5 — Impulsli"
+  const ULTRA_TYPE = 2; // "Tur 3 — Ultratovushli": qurilma raqami = klapan manzili, aynan 14 ta raqam
+  const DEV_MAX = 15, DEV_ULTRA = 14;
+  const isUltra = () => Number($("typeSel").value) === ULTRA_TYPE;
   const UNITS = ["1 L", "10 L", "100 L", "1000 L"];
   const VIEWS = ["home", "config", "device", "log", "settings", "help"];
   const SPLASH_MS = 3000;
   const PORT_POLL_MS = 3000;
 
   /* ===================== SOZLAMALAR (localStorage) ===================== */
-  const DEFAULTS = { lang: "uz", theme: "light", sound: true, autofill: true, timeout: 2500, autoconnect: false, lastPort: "", lastBaud: "9600", autoScroll: true,
+  const DEFAULTS = { lang: "uz", theme: "light", sound: true, autofill: true, timeout: 2500, autoconnect: false, lastPort: "", lastBaud: "2400", autoScroll: true,
+    defaultUrl: "https://cabinet.uzmeter.uz/dictionary/water",
     autoDev: false, devMin: "", devMax: "", devNext: "",
     autoM: false, mMin: "", mMax: "", mNext: "" };
   const loadSettings = () => {
@@ -175,6 +179,7 @@
     $("autoconnectChk").checked = settings.autoconnect;
     $("timeoutSel").value = String(settings.timeout);
     $("autoScroll").checked = settings.autoScroll;
+    $("defaultUrl").value = settings.defaultUrl;
   }
   function toggleSound(on) {
     settings.sound = on ?? !settings.sound;
@@ -394,7 +399,7 @@
 
   /* ===================== AVTO RAQAM (oraliq bo'yicha, localStorage'da eslab qolinadi) ===================== */
   const AUTO = {
-    Dev: { len: 15, field: "deviceNo", on: "autoDev", min: "devMin", max: "devMax", next: "devNext" },
+    Dev: { len: 15, varLen: true, field: "deviceNo", on: "autoDev", min: "devMin", max: "devMax", next: "devNext" },
     M: { len: 14, field: "mNo", on: "autoM", min: "mMin", max: "mMax", next: "mNext" },
   };
   const AUTO_KEYS = Object.values(AUTO).flatMap((a) => [a.on, a.min, a.max, a.next]);
@@ -403,18 +408,21 @@
   /** null = oraliq kiritilmagan/noto'g'ri */
   function autoRange(a) {
     const mn = settings[a.min], mx = settings[a.max];
-    if (mn.length !== a.len || mx.length !== a.len || big(mn) > big(mx)) return null;
+    if (!mn.length || mn.length > a.len || mx.length !== mn.length || big(mn) > big(mx)) return null;
     return [big(mn), big(mx)];
   }
+  /** Avto raqam uzunligi: M_NO — doim 14; qurilma raqami — oraliq (min) uzunligi */
+  const autoLen = (a) => (a.varLen && settings[a.min].length ? settings[a.min].length : a.len);
   /** Keyingi beriladigan raqam: "ok" | "exhausted" | "bad" */
   function autoPeek(a) {
     const r = autoRange(a);
     if (!r) return { st: "bad" };
     const nx = settings[a.next];
-    let n = nx.length === a.len ? big(nx) : r[0];
+    // max dan keyingi qiymat (len+1 xona) ham saqlanadi — shunda oraliq tugaganini aniq bilamiz
+    let n = /^\d{1,16}$/.test(nx) ? big(nx) : r[0];
     if (n < r[0]) n = r[0];
     if (n > r[1]) return { st: "exhausted" };
-    return { st: "ok", value: padNo(n, a.len), n };
+    return { st: "ok", value: padNo(n, autoLen(a)), n };
   }
   function renderAutoSub() {
     for (const [k, a] of Object.entries(AUTO)) {
@@ -441,7 +449,7 @@
   function autoAdvance(a) {
     const p = autoPeek(a);
     if (p.st !== "ok") return;
-    settings[a.next] = padNo(p.n + 1n, a.len);
+    settings[a.next] = padNo(p.n + 1n, autoLen(a));
     saveSettings();
     $(`auto${a === AUTO.Dev ? "Dev" : "M"}Next`).value = settings[a.next];
   }
@@ -453,7 +461,11 @@
       const p = autoPeek(a);
       if (p.st === "ok" && $(a.field).value === p.value) { autoAdvance(a); any = true; }
     }
-    if (any) autoFillForm(true);
+    if (any) {
+      autoFillForm(true);
+      // oraliq tugagan bo'lsa — foydalanuvchi bilishi shart (maydonda oxirgi raqam qoladi)
+      if (Object.values(AUTO).some((a) => settings[a.on] && autoPeek(a).st === "exhausted")) toast(t("range_end"), "err");
+    }
   }
   function nextNumber() {
     const on = Object.values(AUTO).filter((a) => settings[a.on]);
@@ -471,7 +483,7 @@
         el.addEventListener("input", () => {
           el.value = el.value.replace(/\D/g, "").slice(0, a.len);
           settings[a[key]] = el.value;
-          if (key !== "next" && autoRange(a) && (settings[a.next].length !== a.len || big(settings[a.next]) < autoRange(a)[0])) {
+          if (key !== "next" && autoRange(a) && (settings[a.next].length !== autoLen(a) || big(settings[a.next]) < autoRange(a)[0])) {
             settings[a.next] = settings[a.min];
             $(`auto${k}Next`).value = settings[a.next];
           }
@@ -542,16 +554,29 @@
   const digitsOnly = (input, max) => { input.value = input.value.replace(/\D/g, "").slice(0, max); };
 
   function updateCounters() {
-    for (const [id, max, exact] of [["deviceNo", 15, true], ["mNo", 14, true], ["serverUrl", 128, false]]) {
+    const ultra = isUltra();
+    // [id, max, rule]: "exact" — aynan max ta, "digits" — 1..max ta raqam, "url" — 1..max ta belgi
+    for (const [id, max, rule] of [["deviceNo", ultra ? DEV_ULTRA : DEV_MAX, ultra ? "exact" : "digits"], ["mNo", 14, "exact"], ["serverUrl", 128, "url"]]) {
       const inp = $(id), v = inp.value;
-      const ok = exact ? v.length === max : v.length > 0 && v.length <= max && /^[ -~]+$/.test(v);
+      const ok = rule === "exact" ? v.length === max
+        : rule === "digits" ? v.length > 0 && v.length <= max
+        : v.length > 0 && v.length <= max && /^[!#-[\]-~]+$/.test(v);
       document.querySelectorAll(`[data-cnt="${id}"]`).forEach((c) => { c.textContent = `${v.length} / ${max}`; c.classList.toggle("ok", ok); });
       inp.classList.toggle("invalid", v.length > 0 && !ok);
       inp.parentElement.classList.toggle("ok", ok);
     }
   }
   let previewTimer;
+  /** Qurilma raqami qoidasi tanlangan turga bog'liq: ultratovushlida aynan 14 ta raqam */
+  function updateDevField() {
+    const ultra = isUltra();
+    const hint = document.querySelector('[data-i18n^="hint_device_no"]');
+    hint.dataset.i18n = ultra ? "hint_device_no_ultra" : "hint_device_no";
+    hint.textContent = t(hint.dataset.i18n);
+    $("deviceNo").placeholder = "0".repeat(ultra ? DEV_ULTRA : DEV_MAX);
+  }
   function onFormChange() {
+    updateDevField();
     updateCounters();
     updateInitField();
     clearTimeout(previewTimer);
@@ -573,15 +598,24 @@
     }
     if (state.frameTab === "struct") renderStruct();
   }
-  const resetForm = () => setConfig({ device_no: "", m_no: "", server_url: "", valve_open: true, unit: 0, sends_per_day: 6, meter_type: 0, initial_value: null });
+  const resetForm = () => setConfig({ device_no: "", m_no: "", server_url: settings.defaultUrl, valve_open: true, unit: 0, sends_per_day: 6, meter_type: 0, initial_value: null });
   const resetFormAuto = () => { resetForm(); autoFillForm(true); };
+  /** "Tozalash": forma va o'qilgan qurilma ma'lumotlari tozalanadi (avto raqam o'zi to'ldirilmaydi) */
+  function clearAll() {
+    resetForm();
+    state.loaded = null; state.loadedAt = null;
+    renderDevice();
+    setStatus(null);
+    toast(t("clear_done"), "ok");
+  }
 
   /** HEX kadrni maydonlarga ajratib jadval ko'rinishida chizadi (PROTOCOL.md → CONFIG). */
   function renderStruct() {
     const box = $("frameStruct");
     if (!state.lastHex) { box.innerHTML = `<div class="empty" style="padding:8px 10px;color:var(--danger)">${escapeHtml($("framePreview").textContent)}</div>`; return; }
     const b = state.lastHex.split(" ");
-    const ascii = (arr) => arr.map((h) => String.fromCharCode(parseInt(h, 16))).join("");
+    // 0x00 — qisqa raqamning to'ldiruvchisi, ko'rsatilmaydi
+    const ascii = (arr) => arr.map((h) => String.fromCharCode(parseInt(h, 16))).join("").replace(/\0+$/, "");
     const urlLen = parseInt(b[37], 16);
     const extra = b.length - (38 + urlLen) - 2; // CRC dan oldingi qo'shimcha baytlar (boshlang'ich qiymat)
     const rows = [
@@ -624,7 +658,9 @@
       const r = await invoke("write_config", { cfg: getConfig(), timeout: settings.timeout });
       log("tx", `${t("log_cmd_sent", { cmd: "0x01" })}: ${r.tx_hex}`);
       if (r.rx_hex) log("rx", r.rx_hex);
-      if (r.ack === 0) { log("info", t("ack_ok")); log("info", t("ok_written")); toast(t("ok_written"), "ok"); setStatus(t("ok_written"), "ok"); playOk(); autoAfterWrite(); }
+      if (r.ack === 0) { log("info", t("ack_ok")); log("info", t("ok_written")); toast(t("ok_written"), "ok"); setStatus(t("ok_written"), "ok"); playOk(); autoAfterWrite();
+        // Boshlang'ich qiymat bir martalik: keyingi yozishda hisoblagich qayta o'rnatilib ketmasin
+        if (getConfig().initial_value != null) { $("initialValue").value = ""; onFormChange(); log("info", t("log_initial_cleared")); } }
       else if (r.ack === 1) { log("error", t("ack_crc")); toast(t("ack_crc"), "err"); setStatus(t("ack_crc"), "err"); playErr(); }
       else if (r.ack === 2) { log("error", t("ack_invalid")); toast(t("ack_invalid"), "err"); setStatus(t("ack_invalid"), "err"); playErr(); }
       else { log("warn", t("no_ack")); toast(t("no_ack")); setStatus(t("no_ack"), "warn"); }
@@ -649,7 +685,7 @@
         state.loadedAt = new Date();
         const m = r.data.telemetry;
         log("info", t("ok_read"));
-        log("info", t("log_telemetry", { w: fmtM3(m.water_volume_l), v: (m.battery_mv / 1000).toFixed(2), p: m.battery_pct }));
+        log("info", t("log_telemetry", { w: fmtM3(m.water_volume_l), r: m.reverse_volume_l == null ? "—" : fmtM3(m.reverse_volume_l), v: (m.battery_mv / 1000).toFixed(2), p: m.battery_pct }));
         if (m.battery_pct < 20) log("warn", t("log_batt_low", { p: m.battery_pct }));
         renderDevice(true);
         if (settings.autofill) { setConfig(r.data.config); toast(t("loaded_to_form"), "ok"); }
@@ -684,7 +720,7 @@
     $("applyBtn").disabled = !d;
     if (!d) {
       cells.forEach((id) => { $(id).textContent = "—"; $(id).classList.add("empty"); $(id).classList.remove("fresh"); $(id).title = ""; });
-      $("tWater").textContent = "—"; $("tBattV").textContent = "—"; $("tBattP").textContent = "—";
+      $("tWater").textContent = "—"; $("tRev").textContent = "—"; $("tBattV").textContent = "—"; $("tBattP").textContent = "—";
       $("battBar").style.width = "0%";
       $("dState").textContent = t("state_none"); $("stateDot").className = "state-dot";
       return;
@@ -700,6 +736,8 @@
     };
     for (const id of cells) { const el = $(id); el.textContent = vals[id]; el.title = vals[id]; el.classList.remove("empty"); el.classList.toggle("fresh", fresh); }
     $("tWater").textContent = fmtM3(m.water_volume_l);
+    // Eski proshivka teskari oqimni yubormaydi — "—"
+    $("tRev").textContent = m.reverse_volume_l == null ? "—" : fmtM3(m.reverse_volume_l);
     $("tBattV").textContent = (m.battery_mv / 1000).toFixed(2);
     $("tBattP").textContent = m.battery_pct;
     const bar = $("battBar");
@@ -736,8 +774,8 @@
     $("protocolBody").innerHTML =
       `<b>Frame</b>: <code>AA 55</code> <code>CMD</code> <code>LEN</code> <code>PAYLOAD…</code> <code>CRC16 lo hi</code> (CRC-16/MODBUS over CMD+LEN+PAYLOAD)
 <table><tr><th>CMD</th><th>Dir</th><th>Payload</th></tr>${rows([["0x01", "PC → device", "CONFIG"], ["0x02", "PC → device", "—"], ["0x81", "device → PC", "status: 0=OK 1=CRC 2=invalid"], ["0x82", "device → PC", "CONFIG + TELEMETRY"]])}</table><b>CONFIG</b>
-<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "15", "device_no (ASCII digits)"], ["15", "14", "m_no (ASCII digits)"], ["29", "1", "valve: 0=closed 1=open"], ["30", "1", "unit: 0=1L 1=10L 2=100L 3=1000L"], ["31", "1", "sends_per_day: 1..24"], ["32", "1", "meter_type: 0..5"], ["33", "1", "url_len N (≤128)"], ["34", "N", "server_url (ASCII)"], ["34+N", "4", "initial_value u32 LE, liters (optional, only 0x01 and meter_type=4 pulse)"]])}</table><b>TELEMETRY</b> (after CONFIG in 0x82)
-<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "4", "water_volume, u32 LE, liters"], ["4", "2", "battery_mv, u16 LE"], ["6", "1", "battery_pct 0..100"]])}</table>`;
+<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "15", "device_no (ASCII, 1..15 digits, 0x00-padded; ultrasonic: 14 = valve address)"], ["15", "14", "m_no (ASCII digits)"], ["29", "1", "valve: 0=closed 1=open"], ["30", "1", "unit: 0=1L 1=10L 2=100L 3=1000L"], ["31", "1", "sends_per_day: 1..24"], ["32", "1", "meter_type: 0..5"], ["33", "1", "url_len N (≤128)"], ["34", "N", "server_url (ASCII)"], ["34+N", "4", "initial_value u32 LE, liters (optional, only 0x01 and meter_type=4 pulse)"]])}</table><b>TELEMETRY</b> (after CONFIG in 0x82)
+<table><tr><th>Offset</th><th>Size</th><th>Field</th></tr>${rows([["0", "4", "water_volume, u32 LE, liters"], ["4", "2", "battery_mv, u16 LE"], ["6", "1", "battery_pct 0..100"], ["7", "4", "reverse_volume, u32 LE, liters (optional)"]])}</table>`;
   }
 
   /* ===================== MENYU (Rust dan) ===================== */
@@ -766,13 +804,23 @@
   $("connectBtn").addEventListener("click", connect);
   $("disconnectBtn").addEventListener("click", () => disconnect());
 
-  $("deviceNo").addEventListener("input", (e) => { digitsOnly(e.target, 15); onFormChange(); });
+  $("deviceNo").addEventListener("input", (e) => { digitsOnly(e.target, isUltra() ? DEV_ULTRA : DEV_MAX); onFormChange(); });
   $("mNo").addEventListener("input", (e) => { digitsOnly(e.target, 14); onFormChange(); });
   $("serverUrl").addEventListener("input", onFormChange);
   $("sendsSel").addEventListener("change", onFormChange);
   $("typeSel").addEventListener("change", onFormChange);
   $("initialValue").addEventListener("input", (e) => { digitsOnly(e.target, 10); onFormChange(); });
   $("nextNoBtn").addEventListener("click", nextNumber);
+  $("clearBtn").addEventListener("click", clearAll);
+  $("defaultUrl").addEventListener("input", (e) => {
+    const old = settings.defaultUrl;
+    const v = e.target.value.trim();
+    settings.defaultUrl = v;
+    saveSettings();
+    // forma bo'sh yoki eski standart manzilda turgan bo'lsa — yangisiga almashtiramiz
+    const cur = $("serverUrl").value.trim();
+    if (cur === "" || cur === old) { $("serverUrl").value = v; onFormChange(); }
+  });
   $("valveSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-val]"); if (!b) return; state.valve = Number(b.dataset.val); syncSegs(); onFormChange(); });
   $("unitSeg").addEventListener("click", (e) => { const b = e.target.closest("button[data-val]"); if (!b) return; state.unit = Number(b.dataset.val); syncSegs(); onFormChange(); });
   $("frameTabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (b) setFrameTab(b.dataset.tab); });
@@ -826,7 +874,8 @@
   syncSegs();
   $("sendsSel").value = "6";
   $("baudSel").value = settings.lastBaud;
-  autoFillForm(true);
+  resetForm();            // har safar toza boshlanadi (server manzili sozlamadan)
+  autoFillForm(true);     // faqat foydalanuvchi yoqqan avto raqamlar
   onFormChange();
   setStatus(null);
   refreshPorts(true);
